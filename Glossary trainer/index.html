@@ -1401,6 +1401,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           event.preventDefault();
           ensureActiveUser();
           const form = event.currentTarget;
+          const svInput = form.querySelector("#svTermInput");
           const sv = form.sv.value.trim();
           const en = form.en.value.trim();
           try {
@@ -1411,6 +1412,9 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
             announce(error.message);
           }
           renderGlossaries();
+          if (svInput) {
+            requestAnimationFrame(() => svInput.focus());
+          }
         });
 
         document.getElementById("termsTableBody").addEventListener("click", handleTermTableClick);
