@@ -225,6 +225,19 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
       padding-left: 0;
     }
 
+    button.danger,
+    .btn.danger {
+      background: rgba(220, 38, 38, 0.12);
+      color: var(--danger);
+    }
+
+    button.danger:hover,
+    .btn.danger:hover {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
+    }
+
     .nav-buttons {
       display: flex;
       gap: 0.5rem;
@@ -554,6 +567,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           <div id="choiceOptions" class="choices-grid hidden" role="group" aria-label="Multiple choice answers"></div>
           <div class="table-actions">
             <button id="nextQuestionBtn" class="secondary" type="button">Next</button>
+            <button id="abortQuizBtn" class="danger" type="button">Abort Quiz</button>
           </div>
           <div id="feedbackMessage" class="hint" aria-live="assertive"></div>
         </div>
@@ -732,6 +746,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
               submit: "Submit",
               hint: "Show hint",
               next: "Next",
+              abort: "Abort Quiz",
               switchToType: "Switch to Type Mode",
               switchToGuess: "Switch to Guess Mode"
             },
@@ -811,6 +826,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
             createGlossaryFirst: "Create a glossary first.",
             quizStarted: "Quiz started.",
             quizFinished: "Quiz finished. Review your results.",
+            quizAborted: "Quiz aborted.",
             modeChanged: ({ modeName }) => `Mode set to ${modeName}.`,
             noIncorrectToRetry: "No incorrect answers to retry.",
             incorrectRemoved: "All incorrect items were removed from the glossary.",
@@ -929,6 +945,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
               submit: "Skicka in",
               hint: "Visa ledtråd",
               next: "Nästa",
+              abort: "Avbryt quiz",
               switchToType: "Byt till skrivläge",
               switchToGuess: "Byt till gissningsläge"
             },
@@ -1008,6 +1025,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
             createGlossaryFirst: "Skapa en ordlista först.",
             quizStarted: "Quiz startat.",
             quizFinished: "Quiz klart. Granska dina resultat.",
+            quizAborted: "Quiz avbrutet.",
             modeChanged: ({ modeName }) => `Läge ändrat till ${modeName}.`,
             noIncorrectToRetry: "Inga felaktiga svar att repetera.",
             incorrectRemoved: "Alla felaktiga ord har tagits bort från ordlistan.",
@@ -1172,6 +1190,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         updateTextContent("#reviewDifficultBtn", t("quiz.buttons.review"));
         updateTextContent("#showHintBtn", t("quiz.buttons.hint"));
         updateTextContent("#nextQuestionBtn", t("quiz.buttons.next"));
+        updateTextContent("#abortQuizBtn", t("quiz.buttons.abort"));
         const submitButton = document.querySelector("#typeAnswerForm button[type='submit']");
         updateTextContent(submitButton, t("quiz.buttons.submit"));
         updateTextContent("#restartQuizBtn", t("results.buttons.restart"));
@@ -1426,6 +1445,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         document.getElementById("nextQuestionBtn").addEventListener("click", () => {
           advanceQuiz();
         });
+        document.getElementById("abortQuizBtn").addEventListener("click", abortQuiz);
       }
 
       function initResultsArea() {
@@ -2176,6 +2196,28 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         showViewSection("resultsView");
         announce(t("messages.quizFinished"));
         quizSession = null;
+      }
+
+      function abortQuiz() {
+        if (!quizSession) return;
+        quizSession = null;
+        document.getElementById("quizArea").classList.add("hidden");
+        document.getElementById("quizIntro").classList.remove("hidden");
+        document.getElementById("resultsView").classList.add("hidden");
+        document.getElementById("quizQuestion").textContent = "";
+        document.getElementById("quizProgressText").textContent = t("quiz.progress", { current: 0, total: 0 });
+        document.getElementById("progressFill").style.width = "0%";
+        document.getElementById("feedbackMessage").textContent = "";
+        const choiceOptions = document.getElementById("choiceOptions");
+        choiceOptions.innerHTML = "";
+        choiceOptions.classList.add("hidden");
+        const typeForm = document.getElementById("typeAnswerForm");
+        typeForm.classList.add("hidden");
+        document.getElementById("typeAnswerInput").value = "";
+        document.getElementById("nextQuestionBtn").disabled = true;
+        renderQuizIntro(getActiveGlossary());
+        showViewSection("quizView");
+        announce(t("messages.quizAborted"));
       }
 
       function scoreTypedAnswer(question, answer) {
