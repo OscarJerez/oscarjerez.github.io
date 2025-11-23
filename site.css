@@ -1,0 +1,633 @@
+:root {
+  /* Light theme base colors */
+  --page-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --nav-bg: rgba(248, 250, 252, 0.9);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --accent: #2563eb;
+
+  /* Backwards-compatible tokens used across the site */
+  --primary: var(--accent);
+  --primary-dark: #1d4ed8;
+  --bg: var(--page-bg);
+  --card: var(--card-bg);
+  --text: var(--text-main);
+  --muted: var(--text-muted);
+  --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.12);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* Ensure legacy tokens override any inline defaults on the Träna page. */
+:root {
+  --accent: #2563eb !important;
+  --primary: var(--accent) !important;
+  --primary-dark: #1d4ed8 !important;
+  --bg: var(--page-bg) !important;
+  --card: var(--card-bg) !important;
+  --text: var(--text-main) !important;
+  --muted: var(--text-muted) !important;
+}
+
+/* Dark theme overrides */
+:root[data-theme="dark"] {
+  --page-bg: #0f172a !important;
+  --card-bg: #111827 !important;
+  --nav-bg: rgba(17, 24, 39, 0.9) !important;
+  --text-main: #395794 !important;
+  --text-muted: #9ca3af !important;
+  --accent: #7aa2ff !important;
+  --primary-dark: #648bdb !important;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  /* Keep legacy tokens in sync for dark mode */
+  --bg: var(--page-bg) !important;
+  --card: var(--card-bg) !important;
+  --text: var(--text-main) !important;
+  --muted: var(--text-muted) !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--accent) 12%, var(--page-bg)), transparent 35%),
+    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--accent) 8%, var(--page-bg)), transparent 32%),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.page-ready .fade-in {
+  opacity: 1;
+  transform: none;
+}
+
+.site-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem 2.5rem;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: var(--nav-bg);
+  border-bottom: 1px solid rgba(100, 116, 139, 0.18);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.2);
+}
+
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.site-nav a {
+  font-weight: 600;
+  color: var(--text);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav a[aria-current="page"] {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary-dark);
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 14px;
+  padding: 0.85rem 1.3rem;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.25);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.28);
+}
+
+.cta-button.secondary {
+  background: #fff;
+  color: var(--primary-dark);
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  box-shadow: none;
+}
+
+.cta-button.secondary:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.cta-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+main {
+  padding: 2.8rem 0 0;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
+  align-items: center;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.9), rgba(224, 242, 254, 0.9));
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  right: -30px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.35), transparent 65%);
+  filter: blur(10px);
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin: 0 0 0.6rem;
+}
+
+.hero p.lead {
+  font-size: 1.05rem;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.pill {
+  background: #fff;
+  color: var(--primary-dark);
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(100, 116, 139, 0.18);
+}
+
+.hero-card {
+  background: var(--card);
+  padding: 1.4rem;
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(100, 116, 139, 0.1);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid rgba(100, 116, 139, 0.14);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+}
+
+.card p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+}
+
+.section {
+  margin: 2.5rem 0;
+}
+
+.section h2 {
+  margin: 0 0 0.8rem;
+}
+
+.section.lead-copy {
+  text-align: center;
+}
+
+.highlight-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.highlight-list li {
+  margin: 0.35rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.highlight-list li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.list {
+  margin: 0.3rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+}
+
+.ad-slot {
+  margin: 2rem 0;
+  padding: 1.4rem;
+  border: 2px dashed rgba(100, 116, 139, 0.45);
+  border-radius: 16px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--card);
+}
+
+.ad-slot.small {
+  padding: 0.9rem;
+  font-size: 0.95rem;
+}
+
+.callout {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(250, 204, 21, 0.12));
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 16px;
+  padding: 1.6rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.footnotes {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+footer {
+  border-top: 1px solid rgba(100, 116, 139, 0.18);
+  padding: 1.5rem 0 2rem;
+  background: var(--nav-bg);
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: center;
+  color: var(--muted);
+}
+
+.footer-links {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+/* Header action area (theme + menu) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.12);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary-dark);
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.18);
+}
+
+.theme-toggle-icon {
+  display: inline-block;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Training page: align background with the calm gradient and remove legacy overlays */
+body.training-page {
+  background:
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--accent) 12%, var(--page-bg)), transparent 38%),
+    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--accent) 10%, var(--page-bg)), transparent 34%),
+    var(--bg);
+}
+
+body.training-page::before,
+body.training-page::after {
+  display: none !important;
+}
+
+/* Training page layout shell */
+.trainer-layout {
+  padding-top: 1.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.trainer-card {
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.12);
+  padding: 1.6rem;
+  border: 1px solid rgba(100, 116, 139, 0.14);
+  position: relative;
+  overflow: hidden;
+}
+
+.trainer-card header {
+  margin-bottom: 1rem;
+}
+
+/* Pill-like tabs for the training nav */
+.nav-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.25rem;
+}
+
+.nav-buttons .nav-btn {
+  background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+  color: var(--text) !important;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent) !important;
+  border-radius: 999px !important;
+  padding: 0.55rem 1rem !important;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-buttons .nav-btn.active {
+  background: var(--accent) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+}
+
+.nav-buttons .nav-btn:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent) !important;
+  color: var(--primary) !important;
+}
+
+/* Training view cards */
+.training-page .view {
+  background: var(--card) !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(100, 116, 139, 0.12) !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+  padding: 1.25rem !important;
+}
+
+.training-page .choices-grid button {
+  /* Keep options readable in dark mode */
+  background: var(--card) !important;
+  color: var(--text-main) !important;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent) !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12) !important;
+}
+
+.training-page .choices-grid button:hover,
+.training-page .choices-grid button:focus-visible {
+  border-color: var(--accent) !important;
+}
+
+.training-page .panel {
+  background: var(--card) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(100, 116, 139, 0.12) !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.training-page .panel-grid {
+  gap: 1rem;
+}
+
+.training-page .table-actions {
+  gap: 0.65rem;
+}
+
+/* Subtle styling for training tables */
+.training-page .table-wrapper {
+  border: 1px solid rgba(100, 116, 139, 0.12) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.training-page table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.training-page table th,
+.training-page table td {
+  padding: 0.75rem 0.9rem !important;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12) !important;
+}
+
+.training-page table th {
+  background: color-mix(in srgb, var(--accent) 10%, transparent) !important;
+  text-align: left;
+}
+
+.training-page table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Align auth form and hint presentation */
+.training-page #authView .panel {
+  min-height: 100%;
+}
+
+.training-page .hint {
+  color: var(--muted);
+}
+
+/* Training page buttons inherit global styles with slight rounding tweaks */
+.training-page button,
+.training-page .btn,
+.training-page .cta-button {
+  border-radius: 12px;
+}
+
+/* Discreet ad slot at top of training area */
+.training-page .ad-slot.small {
+  margin-top: 1.25rem;
+  border: 2px dashed rgba(100, 116, 139, 0.35);
+  background: var(--card);
+}
+
+/* Responsive tweaks for training layout */
+@media (max-width: 800px) {
+  .trainer-card {
+    padding: 1.1rem;
+    border-radius: 18px;
+  }
+
+  .nav-buttons {
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+  }
+
+  .nav-buttons .nav-btn {
+    white-space: nowrap;
+  }
+}
+@media (max-width: 800px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .site-nav {
+    position: absolute;
+    top: 70px;
+    right: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #fff;
+    padding: 0.75rem;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+    min-width: 220px;
+    display: none;
+  }
+
+  .site-nav.is-open {
+    display: flex;
+  }
+
+  .hero {
+    padding: 1.4rem;
+  }
+
+  .site-shell {
+    padding: 0 1rem 2rem;
+  }
+}

@@ -1,6 +1,15 @@
-﻿const CACHE_NAME = "glossary-trainer-cache-v1";
+const CACHE_NAME = "glossary-trainer-cache-v2";
 const ASSETS = [
+  "./",
   "./index.html",
+  "./game.html",
+  "./teachers.html",
+  "./parents.html",
+  "./faq.html",
+  "./about.html",
+  "./privacy.html",
+  "./site.css",
+  "./site.js",
   "./manifest.webmanifest",
   "./Image/background-glossary-neon-tiles-hero-1920x1080.webp"
 ];
