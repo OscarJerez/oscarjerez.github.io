@@ -1,0 +1,2607 @@
+﻿<!--
+README: Deploy on GitHub Pages
+1. Commit these files to a GitHub repository.
+2. In repository settings, enable GitHub Pages for the main branch (root folder).
+3. Visit the published HTTPS URL; the service worker will activate after the first load.
+App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page PWA.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google-analytics.com; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagmanager.com; connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;">
+  <title>Glossary Trainer – Träna</title>
+  <meta name="description" content="Glossary Trainer hjälper elever att träna svenska och engelska glosor med sparade framsteg och offline-stöd.">
+  <meta name="google-adsense-account" content="ca-pub-8840406607435652">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8840406607435652" crossorigin="anonymous"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJ0XDNEQVE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-GJ0XDNEQVE");
+  </script>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMjggMTI4Jz48cmVjdCB3aWR0aD0nMTI4JyBoZWlnaHQ9JzEyOCcgZmlsbD0nIzI1NjNlYicvPjx0ZXh0IHg9JzY0JyB5PSc4NCcgZm9udC1mYW1pbHk9J1NlZ29lIFVJLCBBcmlhbCwgc2Fucy1zZXJpZicgZm9udC1zaXplPSc3MicgZmlsbD0nI2ZmZmZmZicgdGV4dC1hbmNob3I9J21pZGRsZSc+T0c8L3RleHQ+PC9zdmc+">
+  <link rel="stylesheet" href="site.css">
+  <!-- Removed meta[name="theme-color"] (not supported by Firefox/Opera) and added compatible fallbacks -->
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #facc15;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --success: #16a34a;
+      --warning: #ea580c;
+      --danger: #dc2626;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url("Image/background-glossary-neon-tiles-hero-1920x1080.webp") center/cover no-repeat;
+      opacity: 0.35;
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.7));
+      z-index: -1;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+    }
+
+    a {
+      color: var(--primary-dark);
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    #app {
+      max-width: 1100px;
+      margin: auto;
+      padding: 1.5rem;
+      position: relative;
+      z-index: 0;
+    }
+
+    #app header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .view {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.85)),
+        url("Image/background-glossary-neon-tiles-hero-1920x1080.webp") center/cover no-repeat;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 24px rgba(18, 27, 46, 0.08);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .panel-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 1.25rem;
+      border: 1px solid rgba(100, 116, 139, 0.15);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid rgba(100, 116, 139, 0.35);
+      font-size: 1rem;
+      background: #fff;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button,
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.65rem 1.1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    button:hover,
+    .btn:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+      filter: brightness(1.05);
+    }
+
+    button.secondary:hover,
+    .btn.secondary:hover,
+    .nav-buttons button:hover,
+    button.ghost:hover {
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+      filter: brightness(1.08);
+    }
+
+    button:disabled,
+    .btn:disabled {
+      background: rgba(100, 116, 139, 0.4);
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--primary-dark);
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--primary-dark);
+      padding-left: 0;
+    }
+
+    button.danger,
+    .btn.danger {
+      background: rgba(220, 38, 38, 0.12);
+      color: var(--danger);
+    }
+
+    button.danger:hover,
+    .btn.danger:hover {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .nav-buttons button {
+      background: rgba(15, 23, 42, 0.08);
+      color: var(--text);
+    }
+
+    .nav-buttons button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .glossary-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    
+    .logout-accent {
+
+      background: #ff5fd2;
+      color: #160f29;
+      border: none;
+    }
+
+    .logout-accent:hover {
+
+      background: #ff73da;
+      color: #0f0a1a;
+      box-shadow: 0 8px 26px rgba(255, 95, 210, 0.45);
+      filter: brightness(1.08);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(100, 116, 139, 0.12);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.75rem 0.6rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(100, 116, 139, 0.12);
+    }
+
+    th {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 999px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge.success { background: rgba(22, 163, 74, 0.15); color: var(--success); }
+    .badge.partial { background: rgba(234, 88, 12, 0.15); color: var(--warning); }
+    .badge.danger { background: rgba(220, 38, 38, 0.15); color: var(--danger); }
+
+    .quiz-card {
+      background: rgba(37, 99, 235, 0.05);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .quiz-question {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .choices-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin-top: 1rem;
+    }
+
+    .choices-grid button {
+      justify-content: flex-start;
+      background: #fff;
+      color: var(--text);
+      border: 2px solid transparent;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .choices-grid button:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.2);
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .results-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      margin-bottom: 1.5rem;
+    }
+
+    .results-grid .stat {
+      background: rgba(15, 23, 42, 0.06);
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      margin-top: 1rem;
+    }
+
+    .settings-group h3 {
+      margin-top: 0;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .hint {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .warning-text {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    @media (max-width: 720px) {
+      #app {
+        padding: 1rem;
+      }
+
+      #app header {
+        justify-content: center;
+      }
+
+      .nav-buttons {
+        justify-content: center;
+      }
+
+      .choices-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body class="training-page">
+    <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="index.html" aria-label="Glossary Trainer startsida">
+        <span class="brand-mark" aria-hidden="true">GT</span>
+        <div>
+          <div>Glossary Trainer</div>
+          <small>Svenska ↔ Engelska</small>
+        </div>
+      </a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Byt tema">
+          <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+        </button>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primaryNavGame" aria-label="Öppna meny">Meny</button>
+      </div>
+      <nav class="site-nav" id="primaryNavGame">
+        <a href="index.html">Start</a>
+        <a href="game.html" aria-current="page">Träna</a>
+        <a href="teachers.html">Lärare</a>
+        <a href="parents.html">Föräldrar</a>
+        <a href="faq.html">FAQ</a>
+        <a href="about.html">Om</a>
+        <a href="privacy.html">Integritet</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="site-shell">
+    <aside class="ad-slot small" aria-label="Ad placeholder">
+      <!-- Future AdSense ad slot: keep ads outside the game area -->
+      Diskret annonsyta om den behövs, spelzonen nedan är ren för eleverna.
+    </aside>
+  </div>
+
+  <main class="site-shell trainer-layout">
+  <div id="app" class="trainer-card">
+    <header>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">GT</div>
+        <div>
+          <h1 id="brandTitle">Glossary Trainer – Träna glosor</h1>
+          <p id="brandWarning" class="hint">Educational login stored locally; not for sensitive data.</p>
+        </div>
+      </div>
+      <div id="sessionInfo" class="pill hidden" aria-live="polite"></div>
+      <button id="logoutBtn" class="secondary hidden logout-accent" type="button">Logout</button>
+    </header>
+
+    <section id="authView" class="view">
+      <h2 id="authTitle">Sign In or Create an Account</h2>
+      <p id="authHint" class="hint">Each player creates their own glossary and progress. Passwords are salted and hashed locally.</p>
+      <div class="panel-grid">
+        <div class="panel">
+          <h3 id="registerHeading">Register</h3>
+          <form id="registerForm">
+            <label for="registerUsername">Username</label>
+            <input id="registerUsername" name="username" type="text" autocomplete="username" minlength="3" maxlength="30" required>
+            <label for="registerPassword">Password (min 8 characters)</label>
+            <input id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="8" required>
+            <p class="hint">Usernames are unique, case-insensitive.</p>
+            <button type="submit">Create Account</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h3 id="loginHeading">Login</h3>
+          <form id="loginForm">
+            <label for="loginUsername">Username</label>
+            <input id="loginUsername" name="username" type="text" autocomplete="username" required>
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+            <p class="hint">After five failed attempts the login pauses briefly to protect accounts.</p>
+            <button type="submit">Enter</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="appView" class="view hidden" aria-live="polite">
+      <nav class="nav-buttons" aria-label="Main">
+        <button class="nav-btn active" data-target="glossaryView" type="button">Glossary Builder</button>
+        <button class="nav-btn" data-target="quizView" type="button">Quiz</button>
+        <button class="nav-btn" data-target="resultsView" type="button">Results & Review</button>
+        <button class="nav-btn" data-target="settingsView" type="button">Settings</button>
+      </nav>
+
+      <section id="glossaryView">
+        <h2 id="glossaryTitle">Build Your Glossaries</h2>
+        <div class="glossary-controls">
+          <div>
+            <label for="glossarySelect">Active Glossary</label>
+            <select id="glossarySelect"></select>
+          </div>
+          <div class="table-actions">
+            <button id="createGlossaryBtn" type="button">New Glossary</button>
+            <button id="renameGlossaryBtn" class="secondary" type="button">Rename</button>
+            <button id="duplicateGlossaryBtn" class="secondary" type="button">Duplicate</button>
+            <button id="deleteGlossaryBtn" class="secondary" type="button">Delete</button>
+          </div>
+          <span class="pill" id="termCountPill">0 terms</span>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel">
+            <h3>Exportera ordlista</h3>
+            <p class="hint">Ladda ner den valda ordlistan som en JSON-fil och dela med klassen.</p>
+            <button id="exportGlossaryBtn" class="secondary" type="button" disabled>Exportera ordlista (JSON)</button>
+          </div>
+          <div class="panel">
+            <h3>Importera ordlista</h3>
+            <p class="hint">Importera en delad JSON-fil. Den sparas direkt i din lista.</p>
+            <label for="importGlossaryInput">Välj JSON-fil med ordlista</label>
+            <input id="importGlossaryInput" type="file" accept="application/json">
+          </div>
+        </div>
+
+        <form id="addTermForm" class="panel-grid" autocomplete="off">
+          <div class="panel">
+            <h3 id="addTermHeading">Add a New Term</h3>
+            <label for="svTermInput">Swedish Word</label>
+            <input id="svTermInput" name="sv" type="text" required>
+            <label for="enTermInput">English Synonyms (comma separated)</label>
+            <input id="enTermInput" name="en" type="text" required>
+            <p class="hint" id="addTermHint">No duplicate entries. Words save automatically. Add at least 1 term before starting the quiz.</p>
+            <button type="submit">Add Term</button>
+          </div>
+        </form>
+
+        <div id="termsTableContainer" class="panel">
+          <h3 id="termsHeading">Terms</h3>
+          <div class="hint" id="noTermsHint">Add at least 1 entry to unlock quizzes.</div>
+          <div class="table-wrapper">
+            <table aria-describedby="termCountPill">
+              <thead>
+                <tr>
+                  <th scope="col">Swedish</th>
+                  <th scope="col">English Synonyms</th>
+                  <th scope="col">Tags</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="termsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="quizView" class="hidden">
+        <h2 id="quizTitle">Practice Session</h2>
+        <p id="quizHint" class="hint">Shuffle words each time. Use keyboard: Enter to submit, 1–4 for choices, N for next.</p>
+        <div class="panel quiz-card" id="quizIntro">
+          <p id="quizIntroText">Choose your mode in Settings, then start when ready.</p>
+          <button id="toggleModeQuizBtn" class="secondary" type="button">Switch Mode</button>
+          <button id="startQuizBtn" type="button">Start Quiz</button>
+          <button id="retryIncorrectBtn" class="secondary hidden" type="button">Retry Incorrect Only</button>
+          <button id="reviewDifficultBtn" class="secondary hidden" type="button">Review Difficult Words</button>
+        </div>
+        <div id="quizArea" class="quiz-card hidden">
+          <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <span id="progressFill"></span>
+          </div>
+          <p id="quizProgressText" class="hint">Question 0 of 0</p>
+          <div id="quizQuestion" class="quiz-question"></div>
+          <form id="typeAnswerForm" class="hidden" autocomplete="off">
+            <label class="sr-only" for="typeAnswerInput">Your answer</label>
+            <input id="typeAnswerInput" type="text" autocomplete="off">
+            <div class="table-actions">
+              <button type="submit">Submit</button>
+              <button id="showHintBtn" class="ghost" type="button">Show hint</button>
+            </div>
+          </form>
+          <div id="choiceOptions" class="choices-grid hidden" role="group" aria-label="Multiple choice answers"></div>
+          <div class="table-actions">
+            <button id="nextQuestionBtn" class="secondary" type="button">Next</button>
+            <button id="abortQuizBtn" class="danger" type="button">Abort Quiz</button>
+          </div>
+          <div id="feedbackMessage" class="hint" aria-live="assertive"></div>
+        </div>
+      </section>
+
+      <section id="resultsView" class="hidden">
+        <h2 id="resultsTitle">Results & Review</h2>
+        <div id="resultsSummary" class="results-grid"></div>
+        <div class="table-actions">
+          <button id="toggleModeResultsBtn" class="secondary" type="button">Switch Mode</button>
+          <button id="restartQuizBtn" class="secondary" type="button">Play Again (Shuffle)</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Swedish</th>
+                <th scope="col">Your Answer</th>
+                <th scope="col">Expected</th>
+                <th scope="col">Similarity %</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="settingsView" class="hidden">
+        <h2 id="settingsTitle">Player Settings & Data</h2>
+        <div class="settings-grid">
+          <div class="settings-group panel">
+            <h3 id="quizPreferencesHeading">Quiz Preferences</h3>
+            <div class="switch-row">
+              <label for="modeSelect">Quiz Mode</label>
+              <select id="modeSelect">
+                <option value="type">Type Mode</option>
+                <option value="guess">Guess Mode</option>
+              </select>
+            </div>
+            <div class="switch-row">
+              <label for="languageSelect">Interface language</label>
+              <select id="languageSelect">
+                <option value="sv">Svenska</option>
+              </select>
+            </div>
+            <div class="switch-row">
+              <input id="hintToggle" type="checkbox">
+              <label for="hintToggle">Show first-letter hint button</label>
+            </div>
+            <div class="switch-row">
+              <input id="punctuationToggle" type="checkbox">
+              <label for="punctuationToggle">Ignore punctuation in answers</label>
+            </div>
+            <div class="switch-row">
+              <input id="strictToggle" type="checkbox">
+              <label for="strictToggle">Strict correct threshold (95%)</label>
+            </div>
+            <div class="switch-row">
+              <input id="diacriticToggle" type="checkbox">
+              <label for="diacriticToggle">Treat diacritics as identical</label>
+            </div>
+          </div>
+          <div class="settings-group panel">
+            <h3 id="playerDataHeading">Player Data</h3>
+            <p class="hint">All progress is stored automatically on this device.</p>
+          </div>
+          <div class="settings-group panel">
+            <h3 id="dangerHeading">Danger Zone</h3>
+            <p id="resetHint" class="hint">Reset to defaults clears settings for this player.</p>
+            <button id="resetSettingsBtn" class="secondary" type="button">Reset Settings</button>
+            <p id="deleteWarning" class="warning-text">Delete account removes all saved glossaries and history.</p>
+            <label id="confirmDeleteLabel" for="confirmDeleteInput">Type your username to confirm</label>
+            <input id="confirmDeleteInput" type="text" autocomplete="off">
+            <button id="deleteAccountBtn" class="btn danger" type="button">Delete Account</button>
+          </div>
+        </div>
+      </section>
+    </section>
+    <div id="ariaStatus" class="sr-only" aria-live="polite"></div>
+  </div>
+  </main>
+  <script src="site.js"></script>
+  <script>
+    (() => {
+      const STORAGE_KEY = "oscarsGlossaryTrainingData";
+      const LEGACY_STORAGE_KEY = "httpsGlossaryTrainerData";
+      const AUTH_DRAFT_KEY = "oscarsGlossaryAuthDraft";
+      const WORD_LISTS_STORAGE_KEY = "glossaryTrainerWordLists";
+      const MIN_TERMS_REQUIRED = 1;
+      const BACKOFF_BASE_MS = 30000;
+      const PARTIAL_THRESHOLD = 60;
+      const TRANSLATIONS = {
+        sv: {
+          ui: {
+            windowTitle: "Glossary Trainer – Träna",
+            brandTitle: "Glossary Trainer – Träna glosor",
+            brandWarning: "Allt sparas lokalt på denna enhet.",
+            nav: {
+              glossary: "Ordlistor",
+              quiz: "Quiz",
+              results: "Resultat",
+              settings: "Inställningar"
+            },
+            logout: "Byt användare",
+            sessionSignedIn: ({ username }) => `Nu tränar: ${username || "Profil"}`
+          },
+          auth: {
+            title: "Välj profil för att träna",
+            hint: "Profiler är bara namn på denna enhet.",
+            register: {
+              heading: "Ny profil",
+              usernameLabel: "Namn",
+              passwordLabel: " (ignoreras)",
+              hint: "Inga lösenord behövs.",
+              button: "Skapa"
+            },
+            login: {
+              heading: "Byt profil",
+              usernameLabel: "Namn",
+              passwordLabel: " (ignoreras)",
+              hint: "Välj profil. Lösenord krävs inte.",
+              button: "Fortsätt"
+            }
+          },
+          glossary: {
+            title: "Skapa dina ordlistor",
+            activeLabel: "Aktiv ordlista",
+            buttons: {
+              new: "Ny ordlista",
+              rename: "Byt namn",
+              duplicate: "Duplicera",
+              delete: "Ta bort"
+            },
+            defaultName: "Min ordlista",
+            initialName: "Min första ordlista",
+            importedName: "Importerad ordlista",
+            untitled: "Namnlös ordlista",
+            prompts: {
+              newName: "Namn på ny ordlista?",
+              rename: "Byt namn på ordlista:",
+              duplicate: "Namn för duplicerad ordlista?",
+              copySuffix: " Kopia",
+              confirmDelete: ({ name }) => `Ta bort ordlistan "${name}"? Detta går inte att ångra.`,
+              confirmDeleteTerm: ({ term }) => `Ta bort "${term}"?`
+            },
+            addHeading: "Lägg till nytt ord",
+            svLabel: "Svenskt ord",
+            enLabel: "Engelska synonymer (kommaseparerade)",
+            addHint: "Inga dubbletter. Orden sparas automatiskt. Lägg till minst 1 ord innan du startar quizet.",
+            addButton: "Lägg till ord",
+            termsHeading: "Ord",
+            empty: "Inga ord ännu. Lägg till ditt första glospar.",
+            termCount: ({ count }) => `${count} ${count === 1 ? "ord" : "ord"}`,
+            moreNeeded: ({ remaining }) =>
+              remaining === 1
+                ? "Lägg till 1 ord till för att låsa upp quiz."
+                : `Lägg till ${remaining} fler ord för att låsa upp quiz.`,
+            ready: "Toppen! Du kan starta ett quiz när som helst.",
+            table: {
+              swedish: "Svenska",
+              english: "Engelska synonymer",
+              tags: "Taggar",
+              actions: "Åtgärder"
+            },
+            actions: {
+              edit: "Redigera",
+              delete: "Ta bort",
+              save: "Spara",
+              cancel: "Avbryt"
+            }
+          },
+          quiz: {
+            title: "Övningspass",
+            hint: "Blanda orden varje gång. Tangentbord: Enter skickar, 1-4 för alternativ, N för nästa.",
+            intro: "Byt läge med knappen eller i inställningar och starta när du är redo.",
+            buttons: {
+              start: "Starta quiz",
+              retry: "Försök igen med fel svar",
+              review: "Repetera svåra ord",
+              submit: "Skicka in",
+              hint: "Visa ledtråd",
+              next: "Nästa",
+              abort: "Avbryt quiz",
+              switchToType: "Byt till skrivläge",
+              switchToGuess: "Byt till gissningsläge"
+            },
+            progress: ({ current, total }) => `Fråga ${current} av ${total}`,
+            hintMessage: ({ letter }) => `Ledtråd: börjar med ${letter}`,
+            statuses: {
+              correct: "Rätt",
+              partial: "Delvis rätt",
+              incorrect: "Fel"
+            },
+            feedback: ({ status, expected, similarity }) => `${status} | Förväntat: ${expected} (${similarity}%)`,
+            expectedLabel: "Förväntat",
+            resultsAnnounce: "Quiz klart. Granska dina resultat."
+          },
+          results: {
+            title: "Resultat och repetition",
+            stats: {
+              overall: "Total träffsäkerhet",
+              correct: "Rätt",
+              partial: "Delvis rätt",
+              incorrect: "Fel"
+            },
+            buttons: {
+              restart: "Spela igen (blanda)"
+            },
+            headers: {
+              swedish: "Svenska",
+              yourAnswer: "Ditt svar",
+              expected: "Förväntat",
+              similarity: "Likhet %",
+              status: "Status"
+            },
+            emptyHint: "Genomför ett quiz för att se resultat."
+          },
+          settings: {
+            title: "Spelarinställningar & data",
+            quizPreferences: "Quizinställningar",
+            playerDataHeading: "Spelardata",
+            modeLabel: "Quizläge",
+            modeOptions: {
+              type: "Skrivläge",
+              guess: "Gissningsläge"
+            },
+            languageLabel: "Gränssnittsspråk",
+            languageOptions: {
+              sv: "Svenska"
+            },
+            hintToggle: "Visa ledtråd med första bokstaven",
+            punctuationToggle: "Ignorera skiljetecken i svar",
+            strictToggle: "Strikt gräns för rätt (95%)",
+            diacriticsToggle: "Behandla diakritiska tecken som lika",
+            danger: {
+              heading: "Riskzon",
+              resetHint: "Återställning återställer inställningarna för denna spelare.",
+              resetButton: "Återställ inställningar",
+              deleteWarning: "Att ta bort kontot raderar alla sparade ordlistor och historik.",
+              confirmLabel: "Skriv ditt användarnamn för att bekräfta",
+              deleteButton: "Ta bort konto"
+            }
+          },
+          messages: {
+            accountCreated: "Profil sparad.",
+            loginSuccessful: "Profil vald.",
+            loggedOut: "Profil bytt.",
+            glossaryRenamed: "Ordlista döpt om.",
+            glossaryDuplicated: "Ordlista duplicerad.",
+            glossaryDeleted: "Ordlista borttagen.",
+            glossaryCreated: "Ordlista skapad.",
+            termAdded: "Ord tillagt.",
+            termUpdated: "Ord uppdaterat.",
+            termDeleted: "Ord borttaget.",
+            noDifficultWords: "Inga svåra ord hittades ännu.",
+            settingsReset: "Inställningar återställda.",
+            fieldsRequired: "Båda fälten krävs.",
+            duplicateTerm: "Det svenska ordet finns redan.",
+            createGlossaryFirst: "Skapa en ordlista först.",
+            quizStarted: "Quiz startat.",
+            quizFinished: "Quiz klart. Granska dina resultat.",
+            quizAborted: "Quiz avbrutet.",
+            modeChanged: ({ modeName }) => `Läge ändrat till ${modeName}.`,
+            noIncorrectToRetry: "Inga felaktiga svar att repetera.",
+            incorrectRemoved: "Alla felaktiga ord har tagits bort från ordlistan.",
+            completeQuizFirst: "Genomför ett quiz först.",
+            typeUsernameToConfirm: "Skriv ditt användarnamn för att bekräfta radering.",
+            accountDeleted: "Kontot borttaget.",
+            languageChanged: ({ languageName }) => `Språket ändrades till ${languageName}.`,
+            hintEnabled: "Ledtrådsknappen aktiverades.",
+            hintDisabled: "Ledtrådsknappen inaktiverades.",
+            punctuationIgnore: "Skiljetecken ignoreras.",
+            punctuationConsider: "Skiljetecken beaktas.",
+            strictOn: "Strikt läge aktiverat.",
+            strictOff: "Strikt läge avstängt.",
+            diacriticsOn: "Diakritiska tecken ignoreras.",
+            diacriticsOff: "Diakritiska tecken skiljer på svar.",
+            confirmDeleteAccount: "Ta bort ditt konto och alla sparade data?"
+          },
+          errors: {
+            noActiveUser: "Ingen aktiv användare.",
+            usernameTooShort: "Namnet måste vara minst 3 tecken.",
+            passwordTooShort: "Lösenord ignoreras.",
+            usernameExists: "Namnet finns redan.",
+            enterUsernamePassword: "Ange namn.",
+            invalidCredentials: "Ogiltigt namn.",
+            tooManyAttempts: ({ wait }) => `För många försök. Försök igen om ${wait} sekunder.`,
+            createGlossaryFirst: "Skapa en ordlista först.",
+            bothRequired: "Ange både svenska och engelska.",
+            duplicateTerm: "Det svenska ordet finns redan.",
+            invalidDataFormat: "Ogiltigt dataformat."
+          }
+        }
+      };
+      TRANSLATIONS.en = TRANSLATIONS.sv;
+      let currentLanguage = "sv";
+
+      function getTranslationObject(language) {
+        return TRANSLATIONS[language] || TRANSLATIONS.en;
+      }
+
+      function resolveTranslation(obj, path) {
+        return path.split(".").reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
+      }
+
+      function formatString(template, params = {}) {
+        return template.replace(/\{\{(\w+)\}\}/g, (_, key) => (params[key] !== undefined ? String(params[key]) : ""));
+      }
+
+      function getLanguageDisplayName(language, targetLanguage = currentLanguage) {
+        const options = getTranslationObject(targetLanguage)?.settings?.languageOptions;
+        if (options && options[language]) {
+          return options[language];
+        }
+        const fallbackOptions = TRANSLATIONS.sv.settings.languageOptions;
+        return fallbackOptions[language] || language;
+      }
+
+      function t(path, params = {}) {
+        const translation = resolveTranslation(getTranslationObject(currentLanguage), path);
+        const fallback = resolveTranslation(TRANSLATIONS.en, path);
+        const value = translation !== undefined ? translation : fallback;
+        if (typeof value === "function") {
+          return value(params);
+        }
+        if (typeof value === "string") {
+          return formatString(value, params);
+        }
+        return value !== undefined ? value : path;
+      }
+
+      function updateTextContent(selectorOrElement, text) {
+        const element = typeof selectorOrElement === "string" ? document.querySelector(selectorOrElement) : selectorOrElement;
+        if (element) {
+          element.textContent = text;
+        }
+      }
+
+      function applyLanguage() {
+        document.documentElement.lang = currentLanguage;
+        document.title = t("ui.windowTitle");
+        updateTextContent("#brandTitle", t("ui.brandTitle"));
+        updateTextContent("#brandWarning", t("ui.brandWarning"));
+        updateTextContent("#authTitle", t("auth.title"));
+        updateTextContent("#authHint", t("auth.hint"));
+        updateTextContent("#registerHeading", t("auth.register.heading"));
+        updateTextContent("#loginHeading", t("auth.login.heading"));
+        updateTextContent("#glossaryTitle", t("glossary.title"));
+        updateTextContent("#addTermHeading", t("glossary.addHeading"));
+        updateTextContent("#termsHeading", t("glossary.termsHeading"));
+        updateTextContent("#quizTitle", t("quiz.title"));
+        updateTextContent("#quizHint", t("quiz.hint"));
+        updateTextContent("#quizIntroText", t("quiz.intro"));
+        updateTextContent("#resultsTitle", t("results.title"));
+        updateTextContent("#settingsTitle", t("settings.title"));
+        updateTextContent("#quizPreferencesHeading", t("settings.quizPreferences"));
+        updateTextContent("#playerDataHeading", t("settings.playerDataHeading"));
+        updateTextContent("#dangerHeading", t("settings.danger.heading"));
+        updateTextContent("#resetHint", t("settings.danger.resetHint"));
+        updateTextContent("#deleteWarning", t("settings.danger.deleteWarning"));
+        const sessionInfo = document.getElementById("sessionInfo");
+        if (sessionInfo && currentUser) {
+          sessionInfo.textContent = t("ui.sessionSignedIn", { username: currentUser.username });
+        }
+        updateTextContent("#logoutBtn", t("ui.logout"));
+        updateTextContent("label[for='registerUsername']", t("auth.register.usernameLabel"));
+        updateTextContent("label[for='registerPassword']", t("auth.register.passwordLabel"));
+        updateTextContent("#registerForm .hint", t("auth.register.hint"));
+        const registerButton = document.querySelector("#registerForm button[type='submit']");
+        updateTextContent(registerButton, t("auth.register.button"));
+        updateTextContent("label[for='loginUsername']", t("auth.login.usernameLabel"));
+        updateTextContent("label[for='loginPassword']", t("auth.login.passwordLabel"));
+        updateTextContent("#loginForm .hint", t("auth.login.hint"));
+        const loginButton = document.querySelector("#loginForm button[type='submit']");
+        updateTextContent(loginButton, t("auth.login.button"));
+        updateTextContent("label[for='glossarySelect']", t("glossary.activeLabel"));
+        updateTextContent("#createGlossaryBtn", t("glossary.buttons.new"));
+        updateTextContent("#renameGlossaryBtn", t("glossary.buttons.rename"));
+        updateTextContent("#duplicateGlossaryBtn", t("glossary.buttons.duplicate"));
+        updateTextContent("#deleteGlossaryBtn", t("glossary.buttons.delete"));
+        updateTextContent("label[for='svTermInput']", t("glossary.svLabel"));
+        updateTextContent("label[for='enTermInput']", t("glossary.enLabel"));
+        updateTextContent("#addTermHint", t("glossary.addHint"));
+        const addTermButton = document.querySelector("#addTermForm button[type='submit']");
+        updateTextContent(addTermButton, t("glossary.addButton"));
+        const termHeaders = document.querySelectorAll("#termsTableContainer thead th");
+        if (termHeaders.length === 4) {
+          termHeaders[0].textContent = t("glossary.table.swedish");
+          termHeaders[1].textContent = t("glossary.table.english");
+          termHeaders[2].textContent = t("glossary.table.tags");
+          termHeaders[3].textContent = t("glossary.table.actions");
+        }
+        updateTextContent("label[for='modeSelect']", t("settings.modeLabel"));
+        const modeSelect = document.getElementById("modeSelect");
+        if (modeSelect) {
+          Array.from(modeSelect.options).forEach((option) => {
+            if (option.value === "type") option.textContent = t("settings.modeOptions.type");
+            if (option.value === "guess") option.textContent = t("settings.modeOptions.guess");
+          });
+        }
+        updateTextContent("label[for='languageSelect']", t("settings.languageLabel"));
+        const languageSelect = document.getElementById("languageSelect");
+        if (languageSelect) {
+          Array.from(languageSelect.options).forEach((option) => {
+            option.textContent = getLanguageDisplayName(option.value);
+          });
+          languageSelect.value = currentLanguage;
+        }
+        updateTextContent("label[for='hintToggle']", t("settings.hintToggle"));
+        updateTextContent("label[for='punctuationToggle']", t("settings.punctuationToggle"));
+        updateTextContent("label[for='strictToggle']", t("settings.strictToggle"));
+        updateTextContent("label[for='diacriticToggle']", t("settings.diacriticsToggle"));
+        updateTextContent("#resetSettingsBtn", t("settings.danger.resetButton"));
+        updateTextContent("#confirmDeleteLabel", t("settings.danger.confirmLabel"));
+        updateTextContent("#deleteAccountBtn", t("settings.danger.deleteButton"));
+        const navButtons = document.querySelectorAll(".nav-btn");
+        navButtons.forEach((button) => {
+          if (button.dataset.target === "glossaryView") button.textContent = t("ui.nav.glossary");
+          if (button.dataset.target === "quizView") button.textContent = t("ui.nav.quiz");
+          if (button.dataset.target === "resultsView") button.textContent = t("ui.nav.results");
+          if (button.dataset.target === "settingsView") button.textContent = t("ui.nav.settings");
+        });
+        updateTextContent("#startQuizBtn", t("quiz.buttons.start"));
+        updateTextContent("#retryIncorrectBtn", t("quiz.buttons.retry"));
+        updateTextContent("#reviewDifficultBtn", t("quiz.buttons.review"));
+        updateTextContent("#showHintBtn", t("quiz.buttons.hint"));
+        updateTextContent("#nextQuestionBtn", t("quiz.buttons.next"));
+        updateTextContent("#abortQuizBtn", t("quiz.buttons.abort"));
+        const submitButton = document.querySelector("#typeAnswerForm button[type='submit']");
+        updateTextContent(submitButton, t("quiz.buttons.submit"));
+        updateTextContent("#restartQuizBtn", t("results.buttons.restart"));
+        const resultsHeaders = document.querySelectorAll("#resultsView thead th");
+        if (resultsHeaders.length === 5) {
+          resultsHeaders[0].textContent = t("results.headers.swedish");
+          resultsHeaders[1].textContent = t("results.headers.yourAnswer");
+          resultsHeaders[2].textContent = t("results.headers.expected");
+          resultsHeaders[3].textContent = t("results.headers.similarity");
+          resultsHeaders[4].textContent = t("results.headers.status");
+        }
+        updateModeToggleButtons();
+      }
+
+      function setLanguage(language, options = {}) {
+        const { persist = true, updateUI = true } = options;
+        const nextLanguage = TRANSLATIONS[language] ? language : "en";
+        currentLanguage = nextLanguage;
+        if (persist && currentUser) {
+          currentUser.profile.settings.language = nextLanguage;
+          saveCurrentUser();
+        }
+        if (updateUI) {
+          applyLanguage();
+          updateSessionUI();
+          if (currentUser) {
+            renderGlossaries();
+            renderSettings();
+            renderResults();
+            const activeGlossary = getActiveGlossary();
+            renderQuizIntro(activeGlossary);
+            if (quizSession) {
+              renderQuestion();
+            }
+          } else {
+            renderResults();
+          }
+        }
+      }
+      const ariaRegion = document.getElementById("ariaStatus");
+
+      let appData = loadAppState();
+      let currentUser = loadCurrentUser();
+      let authDraft = loadAuthDraft();
+      appData.authActivity = Array.isArray(appData.authActivity) ? appData.authActivity : [];
+      currentLanguage = currentUser?.profile?.settings?.language || "en";
+      let quizSession = null;
+      let quizResults = null;
+      let editingTermId = null;
+
+      document.addEventListener("DOMContentLoaded", init);
+      document.addEventListener("keydown", handleGlobalShortcuts);
+
+      function init() {
+        initAuthForms();
+        initNavigation();
+        initGlossaryBuilder();
+        initQuizArea();
+        initResultsArea();
+        initSettings();
+        setLanguage(currentLanguage, { persist: false });
+        updateSessionUI();
+        if (currentUser) {
+          enterApp();
+        } else {
+          showAuthView();
+        }
+        maybeRegisterServiceWorker();
+      }
+
+      function initAuthForms() {
+        const registerForm = document.getElementById("registerForm");
+        const loginForm = document.getElementById("loginForm");
+        const registerUsernameInput = document.getElementById("registerUsername");
+        const loginUsernameInput = document.getElementById("loginUsername");
+
+        applyAuthDraft(registerForm, loginForm);
+
+        registerUsernameInput.addEventListener("input", (event) => {
+          updateAuthDraft("registerUsername", event.target.value.trim());
+        });
+        loginUsernameInput.addEventListener("input", (event) => {
+          updateAuthDraft("loginUsername", event.target.value.trim());
+        });
+
+        registerForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(registerForm);
+          const username = String(formData.get("username") || "").trim();
+          const password = String(formData.get("password") || "");
+          try {
+            await registerUser(username, password);
+            updateAuthDraft("loginUsername", username);
+            registerForm.reset();
+            clearAuthDraft("registerUsername");
+            applyAuthDraft(registerForm, loginForm);
+            announce(t("messages.accountCreated"));
+          } catch (error) {
+            announce(error.message);
+          }
+          updateSessionUI();
+        });
+
+        loginForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(loginForm);
+          const username = String(formData.get("username") || "").trim();
+          const password = String(formData.get("password") || "");
+          try {
+            await loginUser(username, password);
+            updateAuthDraft("loginUsername", username);
+            loginForm.reset();
+            loginUsernameInput.value = authDraft.loginUsername || "";
+            announce(t("messages.loginSuccessful"));
+          } catch (error) {
+            announce(error.message);
+          }
+          updateSessionUI();
+        });
+      }
+
+      function initNavigation() {
+        const navButtons = document.querySelectorAll(".nav-btn");
+        navButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const targetId = button.dataset.target;
+            showViewSection(targetId);
+            navButtons.forEach((b) => b.classList.toggle("active", b === button));
+          });
+        });
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          appData.currentUserId = null;
+          currentUser = null;
+          saveAppState();
+          quizSession = null;
+          quizResults = null;
+          setLanguage("en", { persist: false });
+          showAuthView();
+          announce(t("messages.loggedOut"));
+          updateSessionUI();
+        });
+      }
+
+      function initGlossaryBuilder() {
+        document.getElementById("createGlossaryBtn").addEventListener("click", () => {
+          const name = prompt(t("glossary.prompts.newName"), t("glossary.defaultName"));
+          if (!name) return;
+          createGlossary(name.trim());
+        });
+
+        document.getElementById("renameGlossaryBtn").addEventListener("click", () => {
+          ensureActiveUser();
+          const glossary = getActiveGlossary();
+          if (!glossary) return;
+          const name = prompt(t("glossary.prompts.rename"), glossary.name);
+          if (!name) return;
+          glossary.name = name.trim().slice(0, 60);
+          glossary.updatedAt = new Date().toISOString();
+          saveCurrentUser();
+          renderGlossaries();
+          announce(t("messages.glossaryRenamed"));
+        });
+
+        document.getElementById("duplicateGlossaryBtn").addEventListener("click", () => {
+          ensureActiveUser();
+          const glossary = getActiveGlossary();
+          if (!glossary) return;
+          const name = prompt(t("glossary.prompts.duplicate"), glossary.name + t("glossary.prompts.copySuffix"));
+          if (!name) return;
+          const clone = structuredClone(glossary);
+          clone.id = crypto.randomUUID();
+          clone.name = name.trim().slice(0, 60);
+          clone.createdAt = new Date().toISOString();
+          clone.updatedAt = clone.createdAt;
+          clone.terms = clone.terms.map((term) => ({ ...term, id: crypto.randomUUID() }));
+          currentUser.glossaries.push(clone);
+          currentUser.profile.activeGlossaryId = clone.id;
+          saveCurrentUser();
+          renderGlossaries();
+          announce(t("messages.glossaryDuplicated"));
+        });
+
+        document.getElementById("deleteGlossaryBtn").addEventListener("click", () => {
+          ensureActiveUser();
+          const glossary = getActiveGlossary();
+          if (!glossary) return;
+          if (!confirm(t("glossary.prompts.confirmDelete", { name: glossary.name }))) return;
+          currentUser.glossaries = currentUser.glossaries.filter((g) => g.id !== glossary.id);
+          if (!currentUser.glossaries.length) {
+            const fallback = createGlossary(t("glossary.defaultName"));
+            currentUser.profile.activeGlossaryId = fallback.id;
+          } else {
+            currentUser.profile.activeGlossaryId = currentUser.glossaries[0].id;
+          }
+          saveCurrentUser();
+          renderGlossaries();
+          announce(t("messages.glossaryDeleted"));
+        });
+
+        document.getElementById("glossarySelect").addEventListener("change", (event) => {
+          ensureActiveUser();
+          currentUser.profile.activeGlossaryId = event.target.value;
+          saveCurrentUser();
+          renderGlossaries();
+        });
+
+        document.getElementById("addTermForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          ensureActiveUser();
+          const form = event.currentTarget;
+          const svInput = form.querySelector("#svTermInput");
+          const sv = form.sv.value.trim();
+          const en = form.en.value.trim();
+          try {
+            addTermToGlossary(sv, en);
+            form.reset();
+            announce(t("messages.termAdded"));
+          } catch (error) {
+            announce(error.message);
+          }
+          renderGlossaries();
+          if (svInput) {
+            requestAnimationFrame(() => svInput.focus());
+          }
+        });
+
+        const exportBtn = document.getElementById("exportGlossaryBtn");
+        if (exportBtn) {
+          exportBtn.addEventListener("click", exportActiveGlossaryToJson);
+        }
+        const importInput = document.getElementById("importGlossaryInput");
+        if (importInput) {
+          importInput.addEventListener("change", handleGlossaryImportFile);
+        }
+
+        document.getElementById("termsTableBody").addEventListener("click", handleTermTableClick);
+      }
+
+      function initQuizArea() {
+        document.getElementById("startQuizBtn").addEventListener("click", () => {
+          tryStartQuiz(getActiveGlossary());
+        });
+        document.getElementById("retryIncorrectBtn").addEventListener("click", retryIncorrectOnly);
+        document.getElementById("reviewDifficultBtn").addEventListener("click", () => {
+          const difficult = collectDifficultTerms();
+          if (!difficult.length) {
+            announce(t("messages.noDifficultWords"));
+            return;
+          }
+          startQuiz(difficult);
+        });
+        document.getElementById("toggleModeQuizBtn").addEventListener("click", toggleQuizMode);
+        document.getElementById("typeAnswerForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (!quizSession) return;
+          const value = document.getElementById("typeAnswerInput").value.trim();
+          handleTypeAnswer(value);
+        });
+        document.getElementById("showHintBtn").addEventListener("click", () => {
+          if (!quizSession) return;
+          const question = quizSession.questions[quizSession.index];
+          const hint = question.term.en[0]?.charAt(0) || "";
+          announce(t("quiz.hintMessage", { letter: hint.toUpperCase() }));
+        });
+        document.getElementById("nextQuestionBtn").addEventListener("click", () => {
+          advanceQuiz();
+        });
+        document.getElementById("abortQuizBtn").addEventListener("click", abortQuiz);
+      }
+
+      function initResultsArea() {
+        document.getElementById("toggleModeResultsBtn").addEventListener("click", toggleQuizMode);
+        document.getElementById("restartQuizBtn").addEventListener("click", () => {
+          const glossary = getActiveGlossary();
+          if (!glossary) return;
+          startQuiz(glossary.terms);
+        });
+      }
+
+      function initSettings() {
+        document.getElementById("modeSelect").addEventListener("change", (event) => {
+          ensureActiveUser();
+          currentUser.profile.settings.mode = event.target.value;
+          saveCurrentUser();
+          const modeName =
+            event.target.value === "type" ? t("settings.modeOptions.type") : t("settings.modeOptions.guess");
+          announce(t("messages.modeChanged", { modeName }));
+          updateModeToggleButtons();
+          renderQuizIntro(getActiveGlossary());
+          if (quizSession) {
+            quizSession.mode = event.target.value;
+            renderQuestion();
+          }
+        });
+        document.getElementById("languageSelect").addEventListener("change", (event) => {
+          ensureActiveUser();
+          const value = event.target.value;
+          setLanguage(value);
+          announce(t("messages.languageChanged", { languageName: getLanguageDisplayName(value) }));
+        });
+        document.getElementById("hintToggle").addEventListener("change", (event) => {
+          ensureActiveUser();
+          currentUser.profile.settings.showHintFirstLetter = event.target.checked;
+          saveCurrentUser();
+          announce(event.target.checked ? t("messages.hintEnabled") : t("messages.hintDisabled"));
+        });
+        document.getElementById("punctuationToggle").addEventListener("change", (event) => {
+          ensureActiveUser();
+          currentUser.profile.settings.ignorePunctuation = event.target.checked;
+          saveCurrentUser();
+          announce(event.target.checked ? t("messages.punctuationIgnore") : t("messages.punctuationConsider"));
+        });
+        document.getElementById("strictToggle").addEventListener("change", (event) => {
+          ensureActiveUser();
+          currentUser.profile.settings.strictThreshold = event.target.checked ? 95 : 90;
+          saveCurrentUser();
+          announce(event.target.checked ? t("messages.strictOn") : t("messages.strictOff"));
+        });
+        document.getElementById("diacriticToggle").addEventListener("change", (event) => {
+          ensureActiveUser();
+          currentUser.profile.settings.diacriticInsensitive = event.target.checked;
+          saveCurrentUser();
+          announce(event.target.checked ? t("messages.diacriticsOn") : t("messages.diacriticsOff"));
+        });
+        document.getElementById("resetSettingsBtn").addEventListener("click", () => {
+          ensureActiveUser();
+          currentUser.profile.settings = getDefaultSettings();
+          currentLanguage = currentUser.profile.settings.language || "en";
+          saveCurrentUser();
+          setLanguage(currentLanguage);
+          announce(t("messages.settingsReset"));
+        });
+        document.getElementById("deleteAccountBtn").addEventListener("click", deleteAccount);
+      }
+      function handleGlobalShortcuts(event) {
+        if (!quizSession) return;
+        if (quizSession.state !== "awaiting") return;
+        if (quizSession.mode === "guess") {
+          if (/^[1-4]$/.test(event.key)) {
+            const index = Number(event.key) - 1;
+            const button = document.querySelector(`#choiceOptions button[data-index="${index}"]`);
+            if (button) {
+              button.click();
+              event.preventDefault();
+            }
+          }
+        }
+        if (event.key.toLowerCase() === "n") {
+          const active = document.activeElement;
+          if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) {
+            return;
+          }
+          advanceQuiz();
+        }
+      }
+
+      function showAuthView() {
+        document.getElementById("authView").classList.remove("hidden");
+        document.getElementById("appView").classList.add("hidden");
+      }
+
+      function enterApp() {
+        document.getElementById("authView").classList.add("hidden");
+        document.getElementById("appView").classList.remove("hidden");
+        ensureActiveUser();
+        const language = currentUser.profile.settings.language || "en";
+        setLanguage(language, { persist: false });
+      }
+
+      function showViewSection(id) {
+        document.querySelectorAll("#appView > section").forEach((section) => {
+          if (section.id === id) {
+            section.classList.remove("hidden");
+          } else if (section.id !== "appView") {
+            section.classList.add("hidden");
+          }
+        });
+      }
+
+      function updateSessionUI() {
+        const sessionInfo = document.getElementById("sessionInfo");
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (currentUser) {
+          sessionInfo.classList.remove("hidden");
+          logoutBtn.classList.remove("hidden");
+          sessionInfo.textContent = t("ui.sessionSignedIn", { username: currentUser.username });
+          logoutBtn.textContent = t("ui.logout");
+        } else {
+          sessionInfo.classList.add("hidden");
+          logoutBtn.classList.add("hidden");
+          sessionInfo.textContent = "";
+          logoutBtn.textContent = t("ui.logout");
+        }
+        updateModeToggleButtons();
+      }
+
+      function ensureActiveUser() {
+        if (!currentUser) {
+          throw new Error(t("errors.noActiveUser"));
+        }
+      }
+
+      async function registerUser(username, password) {
+        if (username.length < 3) throw new Error(t("errors.usernameTooShort"));
+        if (password.length < 8) throw new Error(t("errors.passwordTooShort"));
+        const normalized = normalizeUsername(username);
+        const duplicate = appData.users.find((user) => user.usernameNormalized === normalized);
+        if (duplicate) throw new Error(t("errors.usernameExists"));
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const passwordHash = await hashPassword(password, salt);
+        const newUser = {
+          id: crypto.randomUUID(),
+          username: username.trim(),
+          usernameNormalized: normalized,
+          salt: arrayBufferToBase64(salt),
+          passwordHash,
+          createdAt: new Date().toISOString(),
+          security: { failedAttempts: 0, nextAllowed: 0 },
+          profile: {
+            activeGlossaryId: null,
+            settings: getDefaultSettings()
+          },
+          glossaries: [],
+          history: []
+        };
+        appData.users.push(newUser);
+        appData.currentUserId = newUser.id;
+        currentUser = newUser;
+        currentLanguage = currentUser.profile.settings.language || "en";
+        if (!currentUser.glossaries.length) {
+          const glossary = createGlossary(t("glossary.initialName"));
+          currentUser.profile.activeGlossaryId = glossary.id;
+        }
+        recordAuthEvent("register", currentUser.username);
+        saveAppState();
+        enterApp();
+      }
+
+      async function loginUser(username, password) {
+        if (!username || !password) throw new Error(t("errors.enterUsernamePassword"));
+        const user = appData.users.find((u) => u.usernameNormalized === normalizeUsername(username));
+        if (!user) throw new Error(t("errors.invalidCredentials"));
+        const now = Date.now();
+        if (user.security.nextAllowed && now < user.security.nextAllowed) {
+          const wait = Math.ceil((user.security.nextAllowed - now) / 1000);
+          throw new Error(t("errors.tooManyAttempts", { wait }));
+        }
+        const saltBytes = base64ToArrayBuffer(user.salt);
+        const candidateHash = await hashPassword(password, new Uint8Array(saltBytes));
+        if (candidateHash === user.passwordHash) {
+          user.security.failedAttempts = 0;
+          user.security.nextAllowed = 0;
+          appData.currentUserId = user.id;
+          currentUser = user;
+          currentUser.profile = currentUser.profile || {};
+          const defaults = getDefaultSettings();
+          currentUser.profile.settings = { ...defaults, ...(currentUser.profile.settings || {}) };
+          currentLanguage = currentUser.profile.settings.language || "en";
+          recordAuthEvent("login", currentUser.username);
+          saveAppState();
+          enterApp();
+          return;
+        }
+        user.security.failedAttempts = (user.security.failedAttempts || 0) + 1;
+        if (user.security.failedAttempts >= 5) {
+          const exponent = user.security.failedAttempts - 5;
+          const delay = BACKOFF_BASE_MS * Math.max(1, 2 ** exponent);
+          user.security.nextAllowed = now + delay;
+        }
+        saveAppState();
+        throw new Error(t("errors.invalidCredentials"));
+      }
+
+      async function hashPassword(password, salt) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+          "raw",
+          enc.encode(password),
+          { name: "PBKDF2" },
+          false,
+          ["deriveBits"]
+        );
+        const derivedBits = await crypto.subtle.deriveBits(
+          {
+            name: "PBKDF2",
+            salt,
+            iterations: 150000,
+            hash: "SHA-256"
+          },
+          keyMaterial,
+          256
+        );
+        return arrayBufferToBase64(new Uint8Array(derivedBits));
+      }
+
+      function loadAppState() {
+        try {
+          let raw = localStorage.getItem(STORAGE_KEY);
+          let loadedFromLegacy = false;
+          if (!raw) {
+            raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+            loadedFromLegacy = Boolean(raw);
+          }
+          if (!raw) {
+            return { users: [], currentUserId: null, authActivity: [] };
+          }
+          const parsed = JSON.parse(raw);
+          parsed.users = Array.isArray(parsed.users) ? parsed.users : [];
+          parsed.authActivity = Array.isArray(parsed.authActivity) ? parsed.authActivity : [];
+          if (loadedFromLegacy) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            localStorage.removeItem(LEGACY_STORAGE_KEY);
+          }
+          return parsed;
+        } catch (error) {
+          console.error("Failed to load stored state", error);
+          return { users: [], currentUserId: null, authActivity: [] };
+        }
+      }
+
+      function saveAppState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      }
+
+      // Shared storage helpers for teacher/student word list exchange (no backend needed).
+      function loadAllWordListsFromStorage() {
+        try {
+          const raw = localStorage.getItem(WORD_LISTS_STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.error("Failed to load shared word lists", error);
+          return [];
+        }
+      }
+
+      function saveAllWordListsToStorage(allLists) {
+        try {
+          const safeLists = Array.isArray(allLists) ? allLists : [];
+          localStorage.setItem(WORD_LISTS_STORAGE_KEY, JSON.stringify(safeLists));
+        } catch (error) {
+          console.error("Failed to save shared word lists", error);
+        }
+      }
+
+      function addWordListToStorage(newList) {
+        if (!newList || typeof newList !== "object") return;
+        const listName = String(newList.listName || "").trim() || "Ordlista";
+        const allLists = loadAllWordListsFromStorage();
+        const existingIndex = allLists.findIndex(
+          (item) => String(item.listName || "").trim() === listName
+        );
+        if (existingIndex >= 0) {
+          allLists[existingIndex] = { ...newList, listName };
+        } else {
+          allLists.push({ ...newList, listName });
+        }
+        saveAllWordListsToStorage(allLists);
+      }
+
+      function loadCurrentUser() {
+        if (!appData.currentUserId) return null;
+        const user = appData.users.find((item) => item.id === appData.currentUserId) || null;
+        if (user) {
+          user.profile = user.profile || {};
+          const defaults = getDefaultSettings();
+          user.profile.settings = { ...defaults, ...(user.profile.settings || {}) };
+        }
+        return user;
+      }
+
+      function saveCurrentUser() {
+        const index = appData.users.findIndex((user) => user.id === currentUser.id);
+        if (index >= 0) {
+          appData.users[index] = currentUser;
+          saveAppState();
+        }
+      }
+
+      function loadAuthDraft() {
+        try {
+          const raw = localStorage.getItem(AUTH_DRAFT_KEY);
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === "object" ? parsed : {};
+        } catch (error) {
+          console.error("Failed to load auth draft", error);
+          return {};
+        }
+      }
+
+      function persistAuthDraft() {
+        if (Object.keys(authDraft).length) {
+          localStorage.setItem(AUTH_DRAFT_KEY, JSON.stringify(authDraft));
+        } else {
+          localStorage.removeItem(AUTH_DRAFT_KEY);
+        }
+      }
+
+      function updateAuthDraft(field, value) {
+        if (value) {
+          authDraft[field] = value;
+        } else {
+          delete authDraft[field];
+        }
+        persistAuthDraft();
+      }
+
+      function clearAuthDraft(field) {
+        if (field) {
+          delete authDraft[field];
+        } else {
+          authDraft = {};
+        }
+        persistAuthDraft();
+      }
+
+      function applyAuthDraft(registerForm, loginForm) {
+        if (registerForm?.username && typeof authDraft.registerUsername === "string") {
+          registerForm.username.value = authDraft.registerUsername;
+        }
+        if (loginForm?.username && typeof authDraft.loginUsername === "string") {
+          loginForm.username.value = authDraft.loginUsername;
+        }
+      }
+
+      function recordAuthEvent(type, username) {
+        if (!username) return;
+        if (!Array.isArray(appData.authActivity)) {
+          appData.authActivity = [];
+        }
+        appData.authActivity.unshift({
+          id: crypto.randomUUID(),
+          type,
+          username,
+          timestamp: new Date().toISOString()
+        });
+        appData.authActivity = appData.authActivity.slice(0, 200);
+      }
+
+      function getNextQuizMode() {
+        const current = currentUser?.profile.settings.mode || "type";
+        return current === "type" ? "guess" : "type";
+      }
+
+      function updateModeToggleButtons() {
+        const quizButton = document.getElementById("toggleModeQuizBtn");
+        const resultsButton = document.getElementById("toggleModeResultsBtn");
+        const hasUser = Boolean(currentUser);
+        const nextMode = hasUser ? getNextQuizMode() : "type";
+        const label =
+          nextMode === "type" ? t("quiz.buttons.switchToType") : t("quiz.buttons.switchToGuess");
+        if (quizButton) {
+          quizButton.textContent = label;
+          quizButton.disabled = !hasUser;
+          quizButton.classList.toggle("hidden", !hasUser);
+        }
+        if (resultsButton) {
+          resultsButton.textContent = label;
+          const showResultsButton = hasUser;
+          resultsButton.disabled = !hasUser;
+          resultsButton.classList.toggle("hidden", !showResultsButton);
+        }
+      }
+
+      function toggleQuizMode() {
+        ensureActiveUser();
+        const nextMode = getNextQuizMode();
+        currentUser.profile.settings.mode = nextMode;
+        saveCurrentUser();
+        const modeSelect = document.getElementById("modeSelect");
+        if (modeSelect) {
+          modeSelect.value = nextMode;
+        }
+        const modeName =
+          nextMode === "type" ? t("settings.modeOptions.type") : t("settings.modeOptions.guess");
+        announce(t("messages.modeChanged", { modeName }));
+        updateModeToggleButtons();
+        renderQuizIntro(getActiveGlossary());
+        if (quizSession) {
+          quizSession.mode = nextMode;
+          renderQuestion();
+        }
+      }
+
+      function getDefaultSettings() {
+        return {
+          mode: "type",
+          showHintFirstLetter: false,
+          ignorePunctuation: true,
+          strictThreshold: 90,
+          diacriticInsensitive: true,
+          language: "sv"
+        };
+      }
+
+      function createGlossary(name) {
+        ensureActiveUser();
+        const now = new Date().toISOString();
+        const glossary = {
+          id: crypto.randomUUID(),
+          name: name.trim().slice(0, 60) || t("glossary.untitled"),
+          createdAt: now,
+          updatedAt: now,
+          terms: []
+        };
+        currentUser.glossaries.push(glossary);
+        currentUser.profile.activeGlossaryId = glossary.id;
+        saveCurrentUser();
+        renderGlossaries();
+        announce(t("messages.glossaryCreated"));
+        return glossary;
+      }
+
+      function getActiveGlossary() {
+        ensureActiveUser();
+        const glossary = currentUser.glossaries.find((g) => g.id === currentUser.profile.activeGlossaryId);
+        return glossary || currentUser.glossaries[0] || null;
+      }
+
+      function addTermToGlossary(svInput, enInput) {
+        const glossary = getActiveGlossary();
+        if (!glossary) throw new Error(t("errors.createGlossaryFirst"));
+        const sv = svInput.trim();
+        const enList = enInput.split(",").map((item) => item.trim()).filter(Boolean);
+        if (!sv || !enList.length) throw new Error(t("errors.bothRequired"));
+        const normalizedSv = diacriticNormalize(sv);
+        const duplicates = glossary.terms.some((term) => diacriticNormalize(term.sv) === normalizedSv);
+        if (duplicates) throw new Error(t("errors.duplicateTerm"));
+        const now = new Date().toISOString();
+        glossary.terms.push({
+          id: crypto.randomUUID(),
+          sv,
+          en: enList,
+          tags: []
+        });
+        glossary.updatedAt = now;
+        saveCurrentUser();
+      }
+
+      // Build a safe file name to avoid invalid characters when downloading JSON.
+      function makeSafeFileName(name) {
+        return name
+          .toLowerCase()
+          .replace(/[^a-z0-9\- ]+/gi, "")
+          .trim()
+          .replace(/\s+/g, "-")
+          .slice(0, 80) || "ordlista";
+      }
+
+      // Convert the active glossary into a portable JSON payload for teachers to share.
+      function buildWordListPayload(glossary) {
+        const words = (glossary?.terms || [])
+          .map((term) => {
+            const swedish = (term.sv || "").trim();
+            const englishRaw = Array.isArray(term.en) ? term.en.join(", ") : String(term.en || "");
+            const english = englishRaw.trim();
+            if (!swedish || !english) return null;
+            return { swedish, english };
+          })
+          .filter(Boolean);
+        const createdAt =
+          (glossary?.createdAt && glossary.createdAt.slice(0, 10)) ||
+          new Date().toISOString().slice(0, 10);
+        return {
+          listName: glossary?.name || "Ordlista",
+          languagePair: "sv-en",
+          createdBy: currentUser?.username || "Lärare",
+          createdAt,
+          words
+        };
+      }
+
+      function exportActiveGlossaryToJson() {
+        ensureActiveUser();
+        const glossary = getActiveGlossary();
+        if (!glossary) {
+          alert("Välj en ordlista först.");
+          return;
+        }
+        if (!glossary.terms.length) {
+          alert("Lägg till minst ett ord innan du exporterar.");
+          return;
+        }
+        const payload = buildWordListPayload(glossary);
+        addWordListToStorage(payload);
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${makeSafeFileName(payload.listName)}.json`;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        URLärarevokeObjectURL(url);
+        link.remove();
+        announce("Ordlistan exporterades som JSON.");
+      }
+
+      // Validate and normalize incoming JSON so only simple, safe data is stored.
+      function normalizeImportedWordList(raw) {
+        if (!raw || typeof raw !== "object") {
+          throw new Error("JSON-filen ser inte ut som en giltig ordlista.");
+        }
+        const listName = String(raw.listName || "").trim();
+        const wordsArray = Array.isArray(raw.words) ? raw.words : [];
+        const cleanedWords = wordsArray
+          .map((item) => {
+            if (!item || typeof item !== "object") return null;
+            const swedish = String(item.swedish ?? "").trim();
+            const englishValue = item.english ?? "";
+            const english = Array.isArray(englishValue)
+              ? englishValue.join(", ").trim()
+              : String(englishValue).trim();
+            if (!swedish || !english) return null;
+            return { swedish, english };
+          })
+          .filter(Boolean);
+        if (!listName || !cleanedWords.length) {
+          throw new Error("JSON-filen ser inte ut som en giltig ordlista.");
+        }
+        return {
+          listName,
+          languagePair: raw.languagePair || "sv-en",
+          createdBy: raw.createdBy || "Importerad ordlista",
+          createdAt: raw.createdAt || new Date().toISOString().slice(0, 10),
+          words: cleanedWords
+        };
+      }
+
+      function addImportedListToCurrentUser(wordList) {
+        ensureActiveUser();
+        const glossaryName = wordList.listName || t("glossary.importedName");
+        const glossary = createGlossary(glossaryName);
+        glossary.terms = wordList.words.map((entry) => ({
+          id: crypto.randomUUID(),
+          sv: entry.swedish,
+          en: entry.english.split(",").map((part) => part.trim()).filter(Boolean),
+          tags: []
+        }));
+        glossary.languagePair = wordList.languagePair || "sv-en";
+        glossary.updatedAt = new Date().toISOString();
+        saveCurrentUser();
+        renderGlossaries();
+      }
+
+      function handleGlossaryImportFile(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FiLärareader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            const normalized = normalizeImportedWordList(parsed);
+            addWordListToStorage(normalized);
+            addImportedListToCurrentUser(normalized);
+            alert("Ordlistan importerades. Du hittar den nu i din lista.");
+          } catch (error) {
+            console.error("Import failed", error);
+            alert("JSON-filen ser inte ut som en giltig ordlista.");
+          } finally {
+            event.target.value = "";
+          }
+        };
+        reader.onerror = () => {
+          alert("Kunde inte läsa filen. Försök igen.");
+          event.target.value = "";
+        };
+        reader.readAsText(file, "utf-8");
+      }
+
+      function updateExportButtonState(glossary) {
+        const exportBtn = document.getElementById("exportGlossaryBtn");
+        if (!exportBtn) return;
+        const hasGlossary = Boolean(glossary);
+        const hasTerms = Boolean(glossary?.terms?.length);
+        exportBtn.disabled = !(hasGlossary && hasTerms);
+      }
+
+      function renderGlossaries() {
+        if (!currentUser) return;
+        if (!currentUser.glossaries.length) {
+          createGlossary(t("glossary.defaultName"));
+        }
+        const select = document.getElementById("glossarySelect");
+        select.innerHTML = "";
+        currentUser.glossaries.forEach((glossary) => {
+          const option = document.createElement("option");
+          option.value = glossary.id;
+          option.textContent = glossary.name;
+          option.selected = glossary.id === currentUser.profile.activeGlossaryId;
+          select.appendChild(option);
+        });
+        const glossary = getActiveGlossary();
+        const count = glossary ? glossary.terms.length : 0;
+        document.getElementById("termCountPill").textContent = t("glossary.termCount", { count });
+        document.getElementById("noTermsHint").textContent =
+          count >= MIN_TERMS_REQUIRED
+            ? t("glossary.ready")
+            : t("glossary.moreNeeded", { remaining: MIN_TERMS_REQUIRED - count });
+        updateExportButtonState(glossary);
+        renderTermTable(glossary);
+        renderQuizIntro(glossary);
+      }
+
+      function renderTermTable(glossary) {
+        const tbody = document.getElementById("termsTableBody");
+        tbody.innerHTML = "";
+        if (!glossary || !glossary.terms.length) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 4;
+          cell.textContent = t("glossary.empty");
+          row.appendChild(cell);
+          tbody.appendChild(row);
+          return;
+        }
+        glossary.terms.forEach((term) => {
+          if (editingTermId === term.id) {
+            const row = document.createElement("tr");
+            row.dataset.termId = term.id;
+            row.innerHTML = `
+              <td><input type="text" class="term-edit-sv" value="${term.sv.replace(/"/g, "&quot;")}"></td>
+              <td><input type="text" class="term-edit-en" value="${term.en.join(", ").replace(/"/g, "&quot;")}"></td>
+              <td><input type="text" class="term-edit-tags" value="${term.tags.join(", ").replace(/"/g, "&quot;")}"></td>
+              <td class="table-actions">
+                <button type="button" data-action="save-term">${t("glossary.actions.save")}</button>
+                <button type="button" data-action="cancel-edit" class="secondary">${t("glossary.actions.cancel")}</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          } else {
+            const row = document.createElement("tr");
+            row.dataset.termId = term.id;
+            row.innerHTML = `
+              <td>${term.sv}</td>
+              <td>${term.en.join(", ")}</td>
+              <td>${term.tags.join(", ") || "—"}</td>
+              <td class="table-actions">
+                <button type="button" data-action="edit-term" class="secondary">${t("glossary.actions.edit")}</button>
+                <button type="button" data-action="delete-term" class="secondary">${t("glossary.actions.delete")}</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          }
+        });
+      }
+
+      function handleTermTableClick(event) {
+        const button = event.target.closest("button");
+        if (!button) return;
+        const action = button.dataset.action;
+        const row = button.closest("tr");
+        const termId = row?.dataset.termId;
+        if (!termId) return;
+        const glossary = getActiveGlossary();
+        const term = glossary.terms.find((t) => t.id === termId);
+        switch (action) {
+          case "edit-term":
+            editingTermId = termId;
+            renderTermTable(glossary);
+            break;
+          case "cancel-edit":
+            editingTermId = null;
+            renderTermTable(glossary);
+            break;
+          case "save-term":
+            {
+              const sv = row.querySelector(".term-edit-sv").value.trim();
+              const enRaw = row.querySelector(".term-edit-en").value.trim();
+              const tagsRaw = row.querySelector(".term-edit-tags").value.trim();
+              if (!sv || !enRaw) {
+                announce(t("messages.fieldsRequired"));
+                return;
+              }
+              const normalizedSv = diacriticNormalize(sv);
+              const duplicate = glossary.terms.some(
+                (other) => other.id !== termId && diacriticNormalize(other.sv) === normalizedSv
+              );
+              if (duplicate) {
+                announce(t("messages.duplicateTerm"));
+                return;
+              }
+              term.sv = sv;
+              term.en = enRaw.split(",").map((item) => item.trim()).filter(Boolean);
+              term.tags = tagsRaw ? tagsRaw.split(",").map((item) => item.trim()).filter(Boolean) : [];
+              glossary.updatedAt = new Date().toISOString();
+              saveCurrentUser();
+              editingTermId = null;
+              renderTermTable(glossary);
+              announce(t("messages.termUpdated"));
+            }
+            break;
+          case "delete-term":
+            if (!confirm(t("glossary.prompts.confirmDeleteTerm", { term: term.sv }))) return;
+            glossary.terms = glossary.terms.filter((t) => t.id !== termId);
+            glossary.updatedAt = new Date().toISOString();
+            saveCurrentUser();
+            renderGlossaries();
+            announce(t("messages.termDeleted"));
+            break;
+          default:
+        }
+      }
+
+      function renderQuizIntro(glossary) {
+        const startButton = document.getElementById("startQuizBtn");
+        const retryButton = document.getElementById("retryIncorrectBtn");
+        const reviewButton = document.getElementById("reviewDifficultBtn");
+        const hasResults = Boolean(quizResults);
+        const hasHistory = collectDifficultTerms().length > 0;
+        const ready = glossary && glossary.terms.length >= MIN_TERMS_REQUIRED;
+        startButton.disabled = !ready;
+        retryButton.classList.toggle("hidden", !hasResults || !quizResults.incorrectTermIds.length);
+        reviewButton.classList.toggle("hidden", !hasHistory);
+        updateModeToggleButtons();
+      }
+
+      function tryStartQuiz(glossary) {
+        if (!glossary) {
+          announce(t("messages.createGlossaryFirst"));
+          return;
+        }
+        if (glossary.terms.length < MIN_TERMS_REQUIRED) {
+          announce(t("glossary.moreNeeded", { remaining: MIN_TERMS_REQUIRED - glossary.terms.length }));
+          return;
+        }
+        startQuiz(glossary.terms);
+      }
+
+      function startQuiz(terms) {
+        if (!currentUser || !terms.length) return;
+        const settings = currentUser.profile.settings;
+        const shuffled = shuffleArray([...terms]);
+        const questions = shuffled.map((term) => ({
+          term,
+          choices: settings.mode === "guess" ? generateChoices(term, shuffled) : [],
+          answered: false,
+          result: null
+        }));
+        quizSession = {
+          id: crypto.randomUUID(),
+          glossaryId: getActiveGlossary()?.id || null,
+          mode: settings.mode,
+          questions,
+          index: 0,
+          state: "awaiting",
+          answers: []
+        };
+        quizResults = null;
+        document.getElementById("quizArea").classList.remove("hidden");
+        document.getElementById("quizIntro").classList.add("hidden");
+        document.getElementById("resultsView").classList.add("hidden");
+        showViewSection("quizView");
+        renderQuestion();
+        announce(t("messages.quizStarted"));
+      }
+
+      function generateChoices(term, pool) {
+        const distractors = pool.filter((item) => item.id !== term.id);
+        const picks = shuffleArray(distractors).slice(0, 3);
+        const options = [...picks, term];
+        return shuffleArray(options).map((item) => ({
+          id: item.id,
+          text: item.en[0] || ""
+        }));
+      }
+
+      function renderQuestion() {
+        if (!quizSession) return;
+        const { questions, index, mode } = quizSession;
+        const question = questions[index];
+        if (!question) {
+          finishQuiz();
+          return;
+        }
+        quizSession.state = "awaiting";
+        const total = questions.length;
+        document.getElementById("quizQuestion").textContent = question.term.sv;
+        document.getElementById("quizProgressText").textContent = t("quiz.progress", { current: index + 1, total });
+        document.getElementById("progressFill").style.width = `${((index) / total) * 100}%`;
+        const typeForm = document.getElementById("typeAnswerForm");
+        const choiceOptions = document.getElementById("choiceOptions");
+        const hintBtn = document.getElementById("showHintBtn");
+        hintBtn.classList.toggle("hidden", !currentUser.profile.settings.showHintFirstLetter);
+        document.getElementById("feedbackMessage").textContent = "";
+        document.getElementById("typeAnswerInput").value = "";
+        document.getElementById("nextQuestionBtn").disabled = true;
+        if (mode === "type") {
+          typeForm.classList.remove("hidden");
+          choiceOptions.classList.add("hidden");
+          document.getElementById("typeAnswerInput").focus();
+        } else {
+          typeForm.classList.add("hidden");
+          choiceOptions.classList.remove("hidden");
+          choiceOptions.innerHTML = "";
+          question.choices.forEach((choice, idx) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.dataset.index = String(idx);
+            button.dataset.choiceId = choice.id;
+            button.textContent = `${idx + 1}. ${choice.text}`;
+            button.addEventListener("click", () => {
+              handleChoiceAnswer(choice.id);
+            });
+            choiceOptions.appendChild(button);
+          });
+          const firstButton = choiceOptions.querySelector("button");
+          firstButton?.focus({ preventScroll: true });
+        }
+      }
+      function handleTypeAnswer(answerRaw) {
+        if (!quizSession || quizSession.state !== "awaiting") return;
+        const question = quizSession.questions[quizSession.index];
+        const settings = currentUser.profile.settings;
+        const answer = settings.ignorePunctuation ? stripPunctuation(answerRaw) : answerRaw;
+        const result = scoreTypedAnswer(question, answer);
+        finalizeQuestion(result, answerRaw);
+      }
+
+      function handleChoiceAnswer(choiceId) {
+        if (!quizSession || quizSession.state !== "awaiting") return;
+        const question = quizSession.questions[quizSession.index];
+        const result = scoreChoiceAnswer(question, choiceId);
+        finalizeQuestion(result, result.answer);
+      }
+
+      function finalizeQuestion(result, rawAnswer) {
+        quizSession.state = "answered";
+        const question = quizSession.questions[quizSession.index];
+        const feedback = document.getElementById("feedbackMessage");
+        question.answered = true;
+        question.result = result;
+        quizSession.answers.push({
+          termId: question.term.id,
+          sv: question.term.sv,
+          yourAnswer: rawAnswer,
+          expected: result.expected,
+          similarity: result.similarity,
+          status: result.status
+        });
+        const similarityText = result.similarity.toFixed(1);
+        feedback.innerHTML = t("quiz.feedback", { status: result.statusLabel, expected: result.expected, similarity: similarityText });
+        feedback.className = `hint ${result.status}`;
+        document.getElementById("progressFill").style.width = `${((quizSession.index + 1) / quizSession.questions.length) * 100}%`;
+        document.getElementById("nextQuestionBtn").disabled = false;
+      }
+
+      function advanceQuiz() {
+        if (!quizSession) return;
+        if (quizSession.index < quizSession.questions.length - 1) {
+          quizSession.index += 1;
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      }
+
+      function finishQuiz() {
+        if (!quizSession) return;
+        const counts = { correct: 0, partial: 0, incorrect: 0 };
+        let totalSimilarity = 0;
+        const perItem = quizSession.answers.map((item) => {
+          counts[item.status] += 1;
+          totalSimilarity += item.similarity;
+          return {
+            termId: item.termId,
+            sv: item.sv,
+            yourAnswer: item.yourAnswer,
+            expected: item.expected,
+            similarity: Number(item.similarity.toFixed(1))
+          };
+        });
+        const overallPct = quizSession.answers.length ? totalSimilarity / quizSession.answers.length : 0;
+        const incorrectTermIds = quizSession.answers.filter((item) => item.status !== "correct").map((item) => item.termId);
+        quizResults = {
+          id: quizSession.id,
+          glossaryId: quizSession.glossaryId,
+          date: new Date().toISOString(),
+          mode: quizSession.mode,
+          overallPct: Number(overallPct.toFixed(1)),
+          counts,
+          perItem,
+          incorrectTermIds
+        };
+        saveHistory(quizResults);
+        renderResults();
+        renderQuizIntro(getActiveGlossary());
+        document.getElementById("quizArea").classList.add("hidden");
+        document.getElementById("quizIntro").classList.remove("hidden");
+        showViewSection("resultsView");
+        announce(t("messages.quizFinished"));
+        quizSession = null;
+      }
+
+      function abortQuiz() {
+        if (!quizSession) return;
+        quizSession = null;
+        document.getElementById("quizArea").classList.add("hidden");
+        document.getElementById("quizIntro").classList.remove("hidden");
+        document.getElementById("resultsView").classList.add("hidden");
+        document.getElementById("quizQuestion").textContent = "";
+        document.getElementById("quizProgressText").textContent = t("quiz.progress", { current: 0, total: 0 });
+        document.getElementById("progressFill").style.width = "0%";
+        document.getElementById("feedbackMessage").textContent = "";
+        const choiceOptions = document.getElementById("choiceOptions");
+        choiceOptions.innerHTML = "";
+        choiceOptions.classList.add("hidden");
+        const typeForm = document.getElementById("typeAnswerForm");
+        typeForm.classList.add("hidden");
+        document.getElementById("typeAnswerInput").value = "";
+        document.getElementById("nextQuestionBtn").disabled = true;
+        renderQuizIntro(getActiveGlossary());
+        showViewSection("quizView");
+        announce(t("messages.quizAborted"));
+      }
+
+      function scoreTypedAnswer(question, answer) {
+        const { term } = question;
+        const expectedList = term.en;
+        const similarity = similarityPercent(answer, expectedList);
+        const threshold = currentUser.profile.settings.strictThreshold || 90;
+        let status = "incorrect";
+        let statusLabel = t("quiz.statuses.incorrect");
+        if (similarity >= threshold) {
+          status = "correct";
+          statusLabel = t("quiz.statuses.correct");
+        } else if (similarity >= PARTIAL_THRESHOLD) {
+          status = "partial";
+          statusLabel = t("quiz.statuses.partial");
+        }
+        return { similarity, expected: expectedList[0] || "", status, statusLabel, answer };
+      }
+
+      function scoreChoiceAnswer(question, choiceId) {
+        const picked = question.term.id === choiceId;
+        return {
+          similarity: picked ? 100 : 0,
+          expected: question.term.en[0] || "",
+          status: picked ? "correct" : "incorrect",
+          statusLabel: picked ? t("quiz.statuses.correct") : t("quiz.statuses.incorrect"),
+          answer: question.choices.find((choice) => choice.id === choiceId)?.text || ""
+        };
+      }
+
+      function saveHistory(result) {
+        ensureActiveUser();
+        const entry = {
+          id: result.id,
+          glossaryId: result.glossaryId,
+          date: result.date,
+          mode: result.mode,
+          overallPct: result.overallPct,
+          counts: result.counts,
+          perItem: result.perItem,
+          incorrectTermIds: result.incorrectTermIds
+        };
+        currentUser.history.unshift(entry);
+        currentUser.history = currentUser.history.slice(0, 1000);
+        saveCurrentUser();
+      }
+
+      function renderResults() {
+        updateModeToggleButtons();
+        const summary = document.getElementById("resultsSummary");
+        const tbody = document.getElementById("resultsTableBody");
+        summary.innerHTML = "";
+        tbody.innerHTML = "";
+        if (!quizResults) {
+          summary.innerHTML = `<p class="hint">${t("results.emptyHint")}</p>`;
+          return;
+        }
+        const { overallPct, counts, perItem } = quizResults;
+        const stats = [
+          { label: t("results.stats.overall"), value: `${overallPct.toFixed(1)}%` },
+          { label: t("results.stats.correct"), value: counts.correct },
+          { label: t("results.stats.partial"), value: counts.partial },
+          { label: t("results.stats.incorrect"), value: counts.incorrect }
+        ];
+        stats.forEach((stat) => {
+          const statElement = document.createElement("div");
+          statElement.className = "stat";
+          const label = document.createElement("span");
+          label.textContent = stat.label;
+          const value = document.createElement("strong");
+          value.textContent = String(stat.value);
+          statElement.append(label, value);
+          summary.appendChild(statElement);
+        });
+        perItem.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.sv}</td>
+            <td>${item.yourAnswer || "—"}</td>
+            <td>${item.expected}</td>
+            <td>${item.similarity.toFixed(1)}</td>
+            <td>${renderStatusBadge(item.similarity)}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      function renderStatusBadge(similarity) {
+        const strictThreshold = currentUser?.profile.settings.strictThreshold || 90;
+        if (similarity >= strictThreshold) {
+          return `<span class="badge success">${t("quiz.statuses.correct")}</span>`;
+        }
+        if (similarity >= PARTIAL_THRESHOLD) {
+          return `<span class="badge partial">${t("quiz.statuses.partial")}</span>`;
+        }
+        return `<span class="badge danger">${t("quiz.statuses.incorrect")}</span>`;
+      }
+
+      function retryIncorrectOnly() {
+        if (!quizResults || !quizResults.incorrectTermIds.length) {
+          announce(t("messages.noIncorrectToRetry"));
+          return;
+        }
+        const glossary = getActiveGlossary();
+        if (!glossary) return;
+        const subset = glossary.terms.filter((term) => quizResults.incorrectTermIds.includes(term.id));
+        if (!subset.length) {
+          announce(t("messages.incorrectRemoved"));
+          return;
+        }
+        startQuiz(subset);
+      }
+
+      function collectDifficultTerms() {
+        if (!currentUser) return [];
+        const threshold = 70;
+        const perTerm = new Map();
+        currentUser.history.forEach((entry) => {
+          entry.perItem.forEach((item) => {
+            if (!perTerm.has(item.termId)) {
+              perTerm.set(item.termId, []);
+            }
+            perTerm.get(item.termId).push(item.similarity);
+          });
+        });
+        const difficult = [];
+        for (const [termId, similarities] of perTerm.entries()) {
+          const recent = similarities.slice(0, 3);
+          const average = recent.reduce((sum, value) => sum + value, 0) / recent.length;
+          if (average < threshold) {
+            const term = getActiveGlossary()?.terms.find((t) => t.id === termId);
+            if (term) difficult.push(term);
+          }
+        }
+        return difficult;
+      }
+
+      function deleteAccount() {
+        if (!currentUser) return;
+        const usernameToRemove = currentUser.username;
+        const confirmation = document.getElementById("confirmDeleteInput").value.trim();
+        if (normalizeUsername(confirmation) !== currentUser.usernameNormalized) {
+          announce(t("messages.typeUsernameToConfirm"));
+          return;
+        }
+        if (!confirm(t("messages.confirmDeleteAccount"))) return;
+        appData.users = appData.users.filter((user) => user.id !== currentUser.id);
+        appData.currentUserId = null;
+        appData.authActivity = Array.isArray(appData.authActivity)
+          ? appData.authActivity.filter((entry) => entry.username !== usernameToRemove)
+          : [];
+        saveAppState();
+        currentUser = null;
+        showAuthView();
+        updateSessionUI();
+        announce(t("messages.accountDeleted"));
+      }
+
+      function renderSettings() {
+        if (!currentUser) return;
+        const settings = currentUser.profile.settings;
+        document.getElementById("modeSelect").value = settings.mode;
+        document.getElementById("languageSelect").value = "sv";
+        document.getElementById("languageSelect").disabled = true;
+        document.getElementById("hintToggle").checked = settings.showHintFirstLetter;
+        document.getElementById("punctuationToggle").checked = settings.ignorePunctuation;
+        document.getElementById("strictToggle").checked = (settings.strictThreshold || 90) >= 95;
+        document.getElementById("diacriticToggle").checked = settings.diacriticInsensitive ?? true;
+        updateModeToggleButtons();
+      }
+
+      function similarityPercent(answer, expectedList) {
+        if (!expectedList.length) return 0;
+        const normalizedAnswers = expectedList.map((item) => normalizeForComparison(item));
+        const candidate = normalizeForComparison(answer);
+        let best = 0;
+        normalizedAnswers.forEach((expected) => {
+          const distance = levenshteinDistance(candidate, expected);
+          const maxLen = Math.max(expected.length, candidate.length, 1);
+          const similarity = 100 * (1 - distance / maxLen);
+          if (similarity > best) {
+            best = similarity;
+          }
+        });
+        return Math.max(0, Math.min(100, best));
+      }
+
+      function normalizeForComparison(value) {
+        if (!value) return "";
+        const settings = currentUser?.profile.settings || getDefaultSettings();
+        const processed = settings.ignorePunctuation ? stripPunctuation(value) : value;
+        if (settings.diacriticInsensitive) {
+          return diacriticNormalize(processed);
+        }
+        return processed.trim().toLowerCase();
+      }
+
+      function levenshteinDistance(a, b) {
+        const m = a.length;
+        const n = b.length;
+        if (m === 0) return n;
+        if (n === 0) return m;
+        const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+        for (let i = 0; i <= m; i++) dp[i][0] = i;
+        for (let j = 0; j <= n; j++) dp[0][j] = j;
+        for (let i = 1; i <= m; i++) {
+          for (let j = 1; j <= n; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(
+              dp[i - 1][j] + 1,
+              dp[i][j - 1] + 1,
+              dp[i - 1][j - 1] + cost
+            );
+          }
+        }
+        return dp[m][n];
+      }
+
+      function diacriticNormalize(value) {
+        return value
+          ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase()
+          : "";
+      }
+
+      function stripPunctuation(value) {
+        return value.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, " ").replace(/\s+/g, " ").trim();
+      }
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      function normalizeUsername(username) {
+        return username.normalize("NFC").trim().toLowerCase();
+      }
+
+      function arrayBufferToBase64(buffer) {
+        let binary = "";
+        const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      }
+
+      function base64ToArrayBuffer(base64) {
+        const binary = atob(base64);
+        const buffer = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          buffer[i] = binary.charCodeAt(i);
+        }
+        return buffer.buffer;
+      }
+
+      function announce(message) {
+        ariaRegion.textContent = "";
+        setTimeout(() => {
+          ariaRegion.textContent = message;
+        }, 16);
+      }
+
+      function maybeRegisterServiceWorker() {
+        if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+          navigator.serviceWorker.register("sw.js").catch((error) => {
+            console.error("Service worker registration failed", error);
+          });
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

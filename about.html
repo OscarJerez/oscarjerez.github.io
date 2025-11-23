@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google-analytics.com; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagmanager.com; connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;">
-  <title>Glossary Trainer | Svenska och Engelska glosor</title>
-  <meta name="description" content="Glossary Trainer hjälper svenska skolbarn, lärare och föräldrar att träna engelska glosor på ett lekfullt och barnsäkert sätt.">
+  <title>Om Glossary Trainer</title>
+  <meta name="description" content="Varför projektet finns, vem som bygger det och vad som kommer härnäst.">
   <meta name="google-adsense-account" content="ca-pub-8840406607435652">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8840406607435652" crossorigin="anonymous"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJ0XDNEQVE"></script>
@@ -19,7 +19,7 @@
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMjggMTI4Jz48cmVjdCB3aWR0aD0nMTI4JyBoZWlnaHQ9JzEyOCcgZmlsbD0nIzI1NjNlYicvPjx0ZXh0IHg9JzY0JyB5PSc4NCcgZm9udC1mYW1pbHk9J1NlZ29lIFVJLCBBcmlhbCwgc2Fucy1zZXJpZicgZm9udC1zaXplPSc3MicgZmlsbD0nI2ZmZmZmZicgdGV4dC1hbmNob3I9J21pZGRsZSc+T0c8L3RleHQ+PC9zdmc+">
   <link rel="stylesheet" href="site.css">
 </head>
-<body class="home">
+<body>
     <header class="site-header">
     <div class="site-header-inner">
       <a class="brand" href="index.html" aria-label="Glossary Trainer startsida">
@@ -36,12 +36,12 @@
         <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primaryNav" aria-label="�ppna meny">Meny</button>
       </div>
       <nav class="site-nav" id="primaryNav">
-        <a href="index.html" aria-current="page">Start</a>
+        <a href="index.html">Start</a>
         <a href="game.html">Träna</a>
         <a href="teachers.html">Lärare</a>
         <a href="parents.html">Föräldrar</a>
         <a href="faq.html">FAQ</a>
-        <a href="about.html">Om</a>
+        <a href="about.html" aria-current="page">Om</a>
         <a href="privacy.html">Integritet</a>
       </nav>
     </div>
@@ -50,88 +50,53 @@
   <main class="site-shell">
     <section class="hero reveal">
       <div>
-        <p class="pill">Svenska skolbarn · Engelska glosor</p>
-        <h1>Träna glosor som känns som ett spel</h1>
-        <p class="lead">Barnvänlig glostränare med korta pass, tydlig återkoppling och offline-stöd. Perfekt för lektioner eller snabba övningar hemma.</p>
-        <div class="hero-pills">
-          <span class="pill">Korta pass (5–10 min)</span>
-          <span class="pill">Sv ↔ En</span>
-          <span class="pill">Fortsätt där du slutade</span>
-          <span class="pill">Barnvänlig layout</span>
-        </div>
-        <div class="cta-group">
-          <a class="cta-button" href="game.html">Starta träningen</a>
-          <a class="cta-button secondary" href="#guide">Hur funkar det?</a>
-        </div>
+        <p class="pill">Om projektet</p>
+        <h1>Varför Glossary Trainer finns</h1>
+        <p class="lead">Vi ville göra ett lugnt, modernt och gratis sätt för barn att träna glosor – utan att behöva konton eller krångliga installationer.</p>
       </div>
       <div class="hero-card">
-        <h3>Byggd för klassrum och hem</h3>
+        <h3>Vår riktning</h3>
         <ul class="highlight-list">
-          <li>Barn kan öva engelska ord utan krånglig setup.</li>
-          <li>Lärare får ett tydligt spel-läge (klassrumskod kommer).</li>
-          <li>Föräldrar ser enkla tips och framstegssummeringar.</li>
+          <li>Barnvänlig UI som inte stressar.</li>
+          <li>Offline-stöd så skolan slipper wifi-problem.</li>
+          <li>Framtida klassrumskoder för enkel delning.</li>
         </ul>
       </div>
     </section>
 
     <aside class="ad-slot reveal" aria-label="Ad placeholder">
       <!-- Future AdSense ad slot: place code here, not inside the game area -->
-      Här kan en framtida banner ligga (över eller under innehåll).
+      En mjuk annonsyta kan ligga här, långt från själva spelupplevelsen.
     </aside>
 
-    <section class="section reveal" id="guide">
-      <h2>Vad är Glossary Trainer?</h2>
-      <p>En enkel, säker och färgrik tränare för svenska elever som behöver repetera engelska glosor. All logik körs helt i webbläsaren och fungerar även offline.</p>
-      <div class="feature-grid">
-        <article class="card">
-          <h3>Öva ord</h3>
-          <p>Flashcards och quiz med feedback på stavning och diakritik. Barnen ser snabbt vad som ska förbättras.</p>
-        </article>
-        <article class="card">
-          <h3>Dela ordlistor (JSON)</h3>
-          <p>Exportera en ordlista som JSON och låt klassen importera den direkt i sina webbläsare – ingen inloggning behövs.</p>
-        </article>
-        <article class="card">
-          <h3>Framsteg</h3>
-          <p>Lokalt sparad historik visar svåra ord och uppmuntrar små förbättringar varje dag.</p>
-        </article>
-      </div>
+    <section class="section reveal">
+      <h2>Bakgrunden</h2>
+      <p>Glossary Trainer startade som ett PWA-experiment för att hjälpa svenska elever att repetera engelska ord med vänlig feedback. Projektet har vuxit till ett litet verktyg för lärare, elever och föräldrar.</p>
+      <p>All kod kör i webbläsaren. Inga servrar eller databaser betyder färre saker som kan gå fel – och bättre integritet för barnen.</p>
     </section>
 
     <section class="section reveal">
-      <h2>För barn, lärare och föräldrar</h2>
+      <h2>Vad som kommer</h2>
       <div class="feature-grid">
         <article class="card">
-          <h3>Barn</h3>
-          <ul class="highlight-list">
-            <li>Tryck på “Träna” och kör 5 minuter.</li>
-            <li>Får vänliga hints och rättningen är snäll.</li>
-            <li>Offline-stöd så övning funkar på bussen.</li>
-          </ul>
+          <h3>Klassrumskod</h3>
+          <p>Dela en ordlista med elever genom att skriva in en kort kod.</p>
         </article>
         <article class="card">
-          <h3>Lärare</h3>
-          <ul class="highlight-list">
-            <li>Planera exit tickets med en färdig ordlista.</li>
-            <li>Kommande “klassrumskod” gör delning enkelt.</li>
-            <li>Annons-ytor hålls borta från själva spelrutan.</li>
-          </ul>
+          <h3>Fler språk</h3>
+          <p>Efter sv/en planeras enkla listor för spanska och tyska.</p>
         </article>
         <article class="card">
-          <h3>Föräldrar</h3>
-          <ul class="highlight-list">
-            <li>Tips för kort daglig rutin.</li>
-            <li>Peppa barnet med små delmål och beröm.</li>
-            <li>Integritet först: bara lokal lagring.</li>
-          </ul>
+          <h3>Delningsbara framsteg</h3>
+          <p>Lätta rapporter som kan exporteras och delas med vårdnadshavare.</p>
         </article>
       </div>
     </section>
 
     <section class="section callout reveal">
-      <h2>Barnvänlig design och AdSense-säkert upplägg</h2>
-      <p>Vi håller spelområdet rent från annonser så fokus ligger på ord och lärande. Annonsytor ligger mellan sektioner och är enkla att flytta eller stänga av.</p>
-      <p class="footnotes">Allt körs på statiska filer (HTML, CSS, JavaScript). Ingen backend eller datadelning med tredje part för inloggning; bara trygg klientlogik.</p>
+      <h2>Vill du hjälpa till?</h2>
+      <p>Skicka idéer om ordlistor, förbättringar eller felsökning. Utbildningsfokus går först och alla ändringar hålls enkla och snälla.</p>
+      <p class="footnotes">Projektet är helt statiskt (HTML/CSS/JS). Ingen backend behövs för att bidra eller testa nya versioner.</p>
     </section>
   </main>
 
@@ -139,13 +104,13 @@
     <div class="footer-inner">
       <div>
         <strong>Glossary Trainer</strong><br>
-        Små, snälla glos-övningar för svenska elever som lär sig engelska.
+        Ett ideellt språk-projekt för svenska elever.
       </div>
       <div class="footer-links">
         <a href="privacy.html">Integritet</a>
         <a href="about.html">Om</a>
         <a href="faq.html">FAQ</a>
-        <a href="game.html">Starta träningen</a>
+        <a href="game.html">Träna</a>
       </div>
     </div>
   </footer>
