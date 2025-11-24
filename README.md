@@ -1,55 +1,46 @@
-# Oscars Glossary Training
+# Glossary Trainer
 
-Oscars Glossary Training is a kid-friendly, browser-based Swedish ↔ English vocabulary trainer. It runs entirely on the client, stores each player’s progress locally, and can work offline once it has been loaded over HTTPS.
+Glossary Trainer är en barnvänlig, helt statisk ordtränare (svenska ↔ engelska). All arkitektur och utveckling är skapad av Oscar Jerez. All logik körs i webbläsaren, data sparas lokalt och sidan kan fungera offline efter första laddningen.
 
-## Features
+## Funktioner
 
-- **Player accounts** stored locally with salted+hashed passwords (educational use only).
-- **Glossary builder** – add, edit, duplicate, and delete vocabulary lists; a quiz can’t start until there are at least ten terms.
-- **Two quiz modes** – free-text “Type Mode” and multiple-choice “Guess Mode”, with quick switching from the quiz or results screens.
-- **Adaptive scoring** via Levenshtein similarity (correct / partial / incorrect) and per-item feedback.
-- **Progress history** per player with “retry incorrect” and “review difficult words” shortcuts.
-- **Offline capable PWA** – service worker caches the app (works best when hosted on HTTPS/GitHub Pages).
-- **Accessibility touches** – keyboard shortcuts, ARIA live announcements, high-contrast UI.
+- **Ordlistor och quiz**: Bygg, döp om, duplicera och ta bort ordlistor. Två lägen: skrivläge och gissningsläge (flervalsfrågor).
+- **Snäll rättning**: Levenshtein-baserad likhetsbedömning med feedback (rätt/delvis/fel) och historik för svåra ord.
+- **Import/export (JSON)**: Dela ordlistor mellan lärare/elever via JSON-filer (helt lokalt).
+- **PWA/offline**: Service workern cachar sidan för offline-användning över HTTPS.
+- **Tillgänglighet**: Tangentbordsstöd, ARIA live och fokusstilar.
 
-## Quick Start
+## Användningstips
 
-```bash
-git clone https://github.com/OscarJerez/glossary-trainer.git
-cd glossary-trainer
-```
+- Data (ordlistor, inställningar, quizhistorik) sparas i `localStorage`. Rensa inte site-data om du vill behålla framsteg.
+- Tangentbordsgenvägar i quiz: **Enter** för att skicka, **N** för nästa, **1–4** för svar i gissningsläge.
+- Minimikravet för att starta ett quiz är 1 ord.
 
-No build step is required. Open `Glossary trainer/index.html` in a modern browser (Chrome, Edge, Firefox, Safari). For the best PWA experience, serve it over HTTPS or `http://localhost` with a static server.
+## Publicering (GitHub Pages)
 
-### Serving locally (optional)
+1. Lägg koden i ett GitHub-repo.
+2. Aktivera **Pages**: deploy från `main` (root-katalogen).
+3. Besök den publicerade URL:en (t.ex. `https://<användare>.github.io/glossary-trainer/index.html`).
+4. Service workern aktiveras vid första laddning över HTTPS.
 
-```bash
-python -m http.server 8000
-# then open http://localhost:8000/Glossary%20trainer/index.html
-```
+## Teknik
 
-## Usage Tips
+- HTML, CSS, vanilla JavaScript (ingen ramverksberoende build).
+- `localStorage` för all ihållande data (inga backend-anrop).
+- `sw.js` + `manifest.webmanifest` för PWA/offline.
 
-- Player data (glossaries, settings, quiz history) lives in the browser’s `localStorage`. Clearing site data resets everything.
-- On the quiz screen you can use **Enter** to submit and **N** to advance, and **1–4** for choices in Guess mode (unless you are typing in the answer field).
-- The mode toggle button is available within both the Quiz and Results views for quick switching.
+## Feedback
 
-## Deployment (GitHub Pages)
-
-1. Commit the repo to GitHub.
-2. In the repository settings, enable **Pages** → Deploy from **main** (or your chosen branch) – root directory.
-3. After GitHub builds, visit the published URL (e.g. `https://<username>.github.io/glossary-trainer/Glossary%20trainer/index.html`).
-4. The PWA/service worker will activate on first load over HTTPS.
-
-## Tech Stack
-
-- HTML5 + CSS3 + vanilla JavaScript (no frameworks).
-- LocalStorage for persistence, Web Crypto API for password hashing.
-- Service worker (`sw.js`) for offline caching, `manifest.webmanifest` for PWA metadata.
-
-## Contributing / Issues
-
-Bug reports and pull requests are welcome! Please feel free to fork the repo, open issues, or submit improvements as you spot them.
+Felrapporter och förbättringsförslag är välkomna. Öppna ett issue eller skicka en PR.
 
 ---
-_Educational project — not intended for storing sensitive user data._
+_Utbildningsprojekt – inga känsliga uppgifter bör lagras._
+
+## License / användning
+
+Copyright (c) 2025 Oscar Jerez. All rights reserved.
+
+Koden i detta repo får inte kopieras, säljas eller distribueras vidare
+som egen produkt utan skriftligt tillstånd från upphovsmannen.
+Du får gärna läsa, lära och inspireras, men inte bygga en kommersiell
+kopia av Glossary Trainer.
