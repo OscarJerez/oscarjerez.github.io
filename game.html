@@ -511,22 +511,18 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         <div class="panel">
           <h3 id="registerHeading">Register</h3>
           <form id="registerForm">
-            <label for="registerUsername">Username</label>
+            <label for="registerUsername">Username (no password needed)</label>
             <input id="registerUsername" name="username" type="text" autocomplete="username" minlength="3" maxlength="30" required>
-            <label for="registerPassword">Password (min 8 characters)</label>
-            <input id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="8" required>
-            <p class="hint">Usernames are unique, case-insensitive.</p>
+            <p class="hint">Profiles are just names on this device.</p>
             <button type="submit">Create Account</button>
           </form>
         </div>
         <div class="panel">
           <h3 id="loginHeading">Login</h3>
           <form id="loginForm">
-            <label for="loginUsername">Username</label>
+            <label for="loginUsername">Username (no password)</label>
             <input id="loginUsername" name="username" type="text" autocomplete="username" required>
-            <label for="loginPassword">Password</label>
-            <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
-            <p class="hint">After five failed attempts the login pauses briefly to protect accounts.</p>
+            <p class="hint">Select an existing profile by name.</p>
             <button type="submit">Enter</button>
           </form>
         </div>
@@ -1002,7 +998,6 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         const registerButton = document.querySelector("#registerForm button[type='submit']");
         updateTextContent(registerButton, t("auth.register.button"));
         updateTextContent("label[for='loginUsername']", t("auth.login.usernameLabel"));
-        updateTextContent("label[for='loginPassword']", t("auth.login.passwordLabel"));
         updateTextContent("#loginForm .hint", t("auth.login.hint"));
         const loginButton = document.querySelector("#loginForm button[type='submit']");
         updateTextContent(loginButton, t("auth.login.button"));
@@ -1148,7 +1143,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           event.preventDefault();
           const formData = new FormData(registerForm);
           const username = String(formData.get("username") || "").trim();
-          const password = String(formData.get("password") || "");
+          const password = "defaultpass123"; // Password ignored; profiles are name-only.
           try {
             await registerUser(username, password);
             updateAuthDraft("loginUsername", username);
@@ -1166,7 +1161,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           event.preventDefault();
           const formData = new FormData(loginForm);
           const username = String(formData.get("username") || "").trim();
-          const password = String(formData.get("password") || "");
+          const password = "defaultpass123"; // Password ignored; profiles are name-only.
           try {
             await loginUser(username, password);
             updateAuthDraft("loginUsername", username);
@@ -1462,13 +1457,13 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
       }
 
       async function registerUser(username, password) {
+        // Password is ignored; profiles are name-only for kids.
         if (username.length < 3) throw new Error(t("errors.usernameTooShort"));
-        if (password.length < 8) throw new Error(t("errors.passwordTooShort"));
         const normalized = normalizeUsername(username);
         const duplicate = appData.users.find((user) => user.usernameNormalized === normalized);
         if (duplicate) throw new Error(t("errors.usernameExists"));
         const salt = crypto.getRandomValues(new Uint8Array(16));
-        const passwordHash = await hashPassword(password, salt);
+        const passwordHash = await hashPassword("defaultpass123", salt);
         const newUser = {
           id: crypto.randomUUID(),
           username: username.trim(),
@@ -1497,39 +1492,22 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         enterApp();
       }
 
-      async function loginUser(username, password) {
-        if (!username || !password) throw new Error(t("errors.enterUsernamePassword"));
+      async function loginUser(username) {
+        // Login by name only; passwords are ignored for child-friendly profiles.
+        if (!username) throw new Error(t("errors.enterUsernamePassword"));
         const user = appData.users.find((u) => u.usernameNormalized === normalizeUsername(username));
         if (!user) throw new Error(t("errors.invalidCredentials"));
-        const now = Date.now();
-        if (user.security.nextAllowed && now < user.security.nextAllowed) {
-          const wait = Math.ceil((user.security.nextAllowed - now) / 1000);
-          throw new Error(t("errors.tooManyAttempts", { wait }));
-        }
-        const saltBytes = base64ToArrayBuffer(user.salt);
-        const candidateHash = await hashPassword(password, new Uint8Array(saltBytes));
-        if (candidateHash === user.passwordHash) {
-          user.security.failedAttempts = 0;
-          user.security.nextAllowed = 0;
-          appData.currentUserId = user.id;
-          currentUser = user;
-          currentUser.profile = currentUser.profile || {};
-          const defaults = getDefaultSettings();
-          currentUser.profile.settings = { ...defaults, ...(currentUser.profile.settings || {}) };
-          currentLanguage = currentUser.profile.settings.language || "en";
-          recordAuthEvent("login", currentUser.username);
-          saveAppState();
-          enterApp();
-          return;
-        }
-        user.security.failedAttempts = (user.security.failedAttempts || 0) + 1;
-        if (user.security.failedAttempts >= 5) {
-          const exponent = user.security.failedAttempts - 5;
-          const delay = BACKOFF_BASE_MS * Math.max(1, 2 ** exponent);
-          user.security.nextAllowed = now + delay;
-        }
+        user.security.failedAttempts = 0;
+        user.security.nextAllowed = 0;
+        appData.currentUserId = user.id;
+        currentUser = user;
+        currentUser.profile = currentUser.profile || {};
+        const defaults = getDefaultSettings();
+        currentUser.profile.settings = { ...defaults, ...(currentUser.profile.settings || {}) };
+        currentLanguage = currentUser.profile.settings.language || "sv";
+        recordAuthEvent("login", currentUser.username);
         saveAppState();
-        throw new Error(t("errors.invalidCredentials"));
+        enterApp();
       }
 
       async function hashPassword(password, salt) {
