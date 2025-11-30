@@ -800,7 +800,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           },
           quiz: {
             title: "Övningspass",
-            hint: "Blanda orden varje gång. Tangentbord: Enter skickar, 1-4 för alternativ, N för nästa.",
+            hint: "Blanda orden varje gång. Tangentbord: Enter skickar, 1-4 för alternativ.",
             intro: "Byt läge med knappen eller i inställningar och starta när du är redo.",
             buttons: {
               start: "Starta quiz",
@@ -1313,10 +1313,13 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           handleTypeAnswer(value);
         });
         document.getElementById("showHintBtn").addEventListener("click", () => {
-          if (!quizSession) return;
+          // Show hint only while awaiting an answer; display text for kids and announce for accessibility.
+          if (!quizSession || quizSession.state !== "awaiting") return;
           const question = quizSession.questions[quizSession.index];
           const hint = question.term.en[0]?.charAt(0) || "";
-          announce(t("quiz.hintMessage", { letter: hint.toUpperCase() }));
+          const hintMessage = t("quiz.hintMessage", { letter: hint.toUpperCase() });
+          document.getElementById("feedbackMessage").textContent = hintMessage;
+          announce(hintMessage);
         });
         document.getElementById("nextQuestionBtn").addEventListener("click", () => {
           advanceQuiz();
