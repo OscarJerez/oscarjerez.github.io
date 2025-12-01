@@ -574,6 +574,8 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
             <input id="svTermInput" name="sv" type="text" required>
             <label for="enTermInput">English Synonyms (comma separated)</label>
             <input id="enTermInput" name="en" type="text" required>
+            <label for="tagTermInput">Taggar (kommaseparerade, valfitt)</label>
+            <input id="tagTermInput" name="tags" type="text" placeholder="verb, tema, kapitel 4">
             <p class="hint" id="addTermHint">No duplicate entries. Words save automatically. Add at least 1 term before starting the quiz.</p>
             <button type="submit">Add Term</button>
           </div>
@@ -1267,8 +1269,9 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
           const svInput = form.querySelector("#svTermInput");
           const sv = form.sv.value.trim();
           const en = form.en.value.trim();
+          const tags = (form.tags?.value || "").trim();
           try {
-            addTermToGlossary(sv, en);
+            addTermToGlossary(sv, en, tags);
             form.reset();
             announce(t("messages.termAdded"));
           } catch (error) {
@@ -1761,7 +1764,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         return glossary || currentUser.glossaries[0] || null;
       }
 
-      function addTermToGlossary(svInput, enInput) {
+      function addTermToGlossary(svInput, enInput, tagsInput = "") {
         const glossary = getActiveGlossary();
         if (!glossary) throw new Error(t("errors.createGlossaryFirst"));
         const sv = svInput.trim();
@@ -1770,12 +1773,15 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         const normalizedSv = diacriticNormalize(sv);
         const duplicates = glossary.terms.some((term) => diacriticNormalize(term.sv) === normalizedSv);
         if (duplicates) throw new Error(t("errors.duplicateTerm"));
+        const tags = tagsInput
+          ? tagsInput.split(",").map((item) => item.trim()).filter(Boolean)
+          : [];
         const now = new Date().toISOString();
         glossary.terms.push({
           id: crypto.randomUUID(),
           sv,
           en: enList,
-          tags: []
+          tags
         });
         glossary.updatedAt = now;
         saveCurrentUser();
