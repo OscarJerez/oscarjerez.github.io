@@ -564,6 +564,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
             <p class="hint">Importera en delad JSON-fil. Den sparas direkt i din lista.</p>
             <label for="importGlossaryInput">Välj JSON-fil med ordlista</label>
             <input id="importGlossaryInput" type="file" accept="application/json">
+            <button id="importGlossaryBtn" class="secondary" type="button">Importera ordlista (JSON)</button>
           </div>
         </div>
 
@@ -1291,6 +1292,10 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         if (importInput) {
           importInput.addEventListener("change", handleGlossaryImportFile);
         }
+        const importButton = document.getElementById("importGlossaryBtn");
+        if (importButton && importInput) {
+          importButton.addEventListener("click", () => importInput.click());
+        }
 
         document.getElementById("termsTableBody").addEventListener("click", handleTermTableClick);
       }
@@ -1841,7 +1846,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
         link.style.display = "none";
         document.body.appendChild(link);
         link.click();
-        URLärarevokeObjectURL(url);
+        URL.revokeObjectURL(url);
         link.remove();
         announce("Ordlistan exporterades som JSON.");
       }
@@ -1896,7 +1901,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
       function handleGlossaryImportFile(event) {
         const file = event.target.files?.[0];
         if (!file) return;
-        const reader = new FiLärareader();
+        const reader = new FileReader();
         reader.onload = () => {
           try {
             const parsed = JSON.parse(reader.result);
@@ -2538,6 +2543,7 @@ App: Oscars Glossary Training (Swedish <-> English) - offline-ready single page 
   </script>
 </body>
 </html>
+
 
 
 
