@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://oscarjerez.github.io/</loc></url>
-  <url><loc>https://oscarjerez.github.io/game.html</loc></url>
-  <url><loc>https://oscarjerez.github.io/teachers.html</loc></url>
-  <url><loc>https://oscarjerez.github.io/parents.html</loc></url>
-  <url><loc>https://oscarjerez.github.io/faq.html</loc></url>
-  <url><loc>https://oscarjerez.github.io/about.html</loc></url>
-  <url><loc>https://oscarjerez.github.io/privacy.html</loc></url>
+  <url>
+    <loc>https://glossarytraining.se/</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/game.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/teachers.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/parents.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/faq.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/about.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/privacy.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/word-lists.html</loc>
+  </url>
+  <url>
+    <loc>https://glossarytraining.se/study-tips.html</loc>
+  </url>
 </urlset>
