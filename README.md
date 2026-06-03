@@ -31,7 +31,7 @@ Glossary Trainer är en barnvänlig, helt statisk ordtränare (svenska ↔ engel
 
 ## Feedback
 
-Felrapporter och förbättringsförslag är välkomna. Öppna ett issue eller skicka en PR.
+Felrapporter och förbättringsförslag är välkomna. Öppna ett issue eller skicka en DM.
 
 ---
 _Utbildningsprojekt – inga känsliga uppgifter bör lagras._
